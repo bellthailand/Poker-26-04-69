@@ -1,179 +1,128 @@
-"use client";
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GTO Trainer (Mobile)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans">
 
-import React, { useState } from 'react';
+    <div id="root"></div>
 
-// ==========================================
-// 1. TYPES (กำหนดโครงสร้างข้อมูล)
-// ==========================================
-type Card = string;
-type ActionType = 'FOLD' | 'CALL' | 'RAISE';
+    <script type="text/babel">
+        const { useState } = React;
 
-interface HandState {
-  heroCards: [Card, Card];
-  board: Card[];
-  potSize: number;
-  effectiveStack: number;
-  opponentBet: number;
-  street: 'PREFLOP' | 'FLOP' | 'TURN' | 'RIVER';
-}
+        // ระบบคำนวณ GTO
+        function evaluateAction(state, userAction) {
+            const potOddsPct = (state.opponentBet / (state.potSize + state.opponentBet * 2)) * 100;
+            const isOverbet = state.opponentBet > state.potSize;
+            
+            if (isOverbet && userAction === 'FOLD') {
+                return {
+                    isCorrect: true,
+                    explanation: `ถูกต้อง! คู่แข่ง Bet $${state.opponentBet} เข้า Pot $${state.potSize} (Overbet) บนบอร์ด A-high การถือแค่ 2nd Pair สู้กับ Overbet Range เป็นการตัดสินใจที่ผิด การ FOLD คือทางเลือกที่ดีที่สุด (+EV)`,
+                };
+            } else if (isOverbet) {
+                return {
+                    isCorrect: false,
+                    explanation: `ผิดพลาด! การ Overbet ของคู่แข่งทำให้ Range ของเขา Polarized (ถ้าไม่นัทก็บลัฟไปเลย) การคอลหรือเรสด้วยไพ่ที่มีขีดจำกัด (Capped) อย่าง 2nd Pair จะทำให้เสียเงินในระยะยาว (-EV)`,
+                };
+            }
 
-interface EvaluationResult {
-  isCorrect: boolean;
-  explanation: string;
-}
+            return {
+                isCorrect: userAction === 'CALL', 
+                explanation: `ระบบได้บันทึก Action ของคุณไว้แล้ว`,
+            };
+        }
 
-// ==========================================
-// 2. LOGIC & MATH (ระบบคำนวณและประเมินผล)
-// ==========================================
-function calculatePotOdds(callAmount: number, currentPot: number): number {
-  if (callAmount === 0) return 0;
-  return callAmount / (currentPot + callAmount);
-}
+        // สถานการณ์จำลอง
+        const mockScenario = {
+            heroCards: ['Ks', 'Qc'],
+            board: ['Ah', '7d', '2s'],
+            potSize: 50,
+            opponentBet: 75,
+            street: 'FLOP',
+        };
 
-function evaluateAction(state: HandState, userAction: ActionType): EvaluationResult {
-  const { board, potSize, opponentBet, heroCards } = state;
-  const potOddsPct = calculatePotOdds(opponentBet, potSize + opponentBet) * 100;
-  
-  const isOverbet = opponentBet > potSize;
-  const hasAceOnBoard = board.some(card => card.includes('A'));
-  const hasKingInHand = heroCards.some(card => card.includes('K'));
+        // UI Component
+        function PokerTrainerApp() {
+            const [feedback, setFeedback] = useState(null);
 
-  // ตัวอย่าง GTO Rule: โดน Overbet บนบอร์ด A-high แต่เรามีแค่คู่ 2nd pair
-  if (isOverbet && hasAceOnBoard && hasKingInHand) {
-    if (userAction === 'FOLD') {
-      return {
-        isCorrect: true,
-        explanation: `ถูกต้อง! คู่แข่ง Bet $${opponentBet} เข้า Pot $${potSize} (Overbet) บนบอร์ด A-high คุณต้องการ Equity ${potOddsPct.toFixed(1)}% ในการคอล ซึ่ง 2nd pair มีไม่พอเมื่อเจอกับ Range ที่กว้างและแข็งแกร่งขนาดนี้ การ FOLD คือทางเลือกที่ดีที่สุด (+EV)`,
-      };
-    } else {
-      return {
-        isCorrect: false,
-        explanation: `ผิดพลาด! การ Overbet ของคู่แข่งทำให้ Range ของเขาแบ่งเป็น 2 ขั้ว (Polarized) คือมีไพ่พรีเมียมไปเลยหรือบลัฟ การคอลหรือเรสด้วยไพ่ที่มีขีดจำกัด (Capped range) อย่าง 2nd pair จะทำให้เสียเงินในระยะยาว (-EV)`,
-      };
-    }
-  }
+            const handleAction = (action) => {
+                setFeedback(evaluateAction(mockScenario, action));
+            };
 
-  // กรณีทั่วไป
-  return {
-    isCorrect: userAction === 'CALL', 
-    explanation: `Pot odds บังคับให้คุณต้องมี Equity อย่างน้อย ${potOddsPct.toFixed(1)}% ถึงจะคุ้มค่า ระบบได้บันทึก Action ของคุณไว้สำหรับการวิเคราะห์เชิงลึกแล้ว`,
-  };
-}
+            return (
+                <div className="min-h-screen flex flex-col items-center sm:py-12">
+                    <div className="w-full max-w-md bg-slate-900 sm:rounded-3xl shadow-2xl border-x sm:border-y border-slate-800 flex flex-col min-h-screen sm:min-h-0">
+                        
+                        <div className="bg-slate-800 p-5 sm:rounded-t-3xl border-b border-slate-700 text-center">
+                            <h1 className="text-xl font-bold text-white tracking-tight">GTO Trainer</h1>
+                        </div>
+                        
+                        <div className="flex-1 p-6 flex flex-col items-center justify-center bg-gradient-to-b from-emerald-900/20 to-slate-900">
+                            <div className="flex w-full gap-4 mb-8">
+                                <div className="flex-1 bg-slate-800/80 rounded-xl p-3 border border-slate-700/50 text-center">
+                                    <span className="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">Pot Size</span>
+                                    <span className="text-2xl font-mono text-emerald-400">${mockScenario.potSize}</span>
+                                </div>
+                                <div className="flex-1 bg-slate-800/80 rounded-xl p-3 border border-slate-700/50 text-center">
+                                    <span className="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">Villain Bet</span>
+                                    <span className="text-2xl font-mono text-rose-400">${mockScenario.opponentBet}</span>
+                                </div>
+                            </div>
 
-// ==========================================
-// 3. UI COMPONENT (หน้าจอแสดงผล - Mobile First)
-// ==========================================
+                            <div className="mb-8 w-full text-center">
+                                <span className="text-xs text-slate-500 uppercase tracking-widest mb-3 block">{mockScenario.street} Board</span>
+                                <div className="flex gap-2 justify-center">
+                                    {mockScenario.board.map((card, i) => (
+                                        <div key={i} className="w-14 h-20 bg-white rounded-lg shadow-lg flex items-center justify-center text-xl font-bold text-slate-900 border-2 border-slate-200">{card}</div>
+                                    ))}
+                                </div>
+                            </div>
 
-// ข้อมูลจำลองสำหรับทดสอบ (จำลองมาจากสถานการณ์ที่ Parse มาแล้ว)
-const mockScenario: HandState = {
-  heroCards: ['Ks', 'Qc'],
-  board: ['Ah', '7d', '2s'],
-  potSize: 50,
-  effectiveStack: 150,
-  opponentBet: 75,
-  street: 'FLOP',
-};
+                            <div className="mb-4 w-full text-center">
+                                <span className="text-xs text-slate-500 uppercase tracking-widest mb-3 block">Hero Cards</span>
+                                <div className="flex gap-2 justify-center">
+                                    {mockScenario.heroCards.map((card, i) => (
+                                        <div key={i} className="w-16 h-24 bg-white rounded-xl shadow-lg flex items-center justify-center text-2xl font-bold text-slate-900 border-2 border-slate-200">{card}</div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
 
-export default function PokerTrainerApp() {
-  const [feedback, setFeedback] = useState<EvaluationResult | null>(null);
+                        {feedback && (
+                            <div className={`p-5 mx-4 mb-4 rounded-2xl border ${feedback.isCorrect ? 'bg-emerald-950/50 border-emerald-800' : 'bg-rose-950/50 border-rose-800'}`}>
+                                <h3 className={`text-base font-bold mb-2 ${feedback.isCorrect ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                    {feedback.isCorrect ? '✅ Optimal Play' : '❌ Suboptimal Play'}
+                               </h3>
+                                <p className="text-slate-300 text-sm leading-relaxed mb-4">{feedback.explanation}</p>
+                                <button onClick={() => setFeedback(null)} className="w-full py-2 bg-slate-800/50 rounded-lg text-sm text-slate-300 hover:bg-slate-700">ลองอีกครั้ง</button>
+                            </div>
+                        )}
 
-  const handleAction = (action: ActionType) => {
-    const result = evaluateAction(mockScenario, action);
-    setFeedback(result);
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 flex flex-col items-center font-sans sm:py-12">
-      <div className="w-full max-w-md bg-slate-900 sm:rounded-3xl shadow-2xl border-x sm:border-y border-slate-800 flex flex-col min-h-screen sm:min-h-0">
-        
-        {/* Header */}
-        <div className="bg-slate-800 p-5 sm:rounded-t-3xl border-b border-slate-700 text-center">
-          <h1 className="text-xl font-bold text-white tracking-tight">GTO Trainer (Mobile)</h1>
-        </div>
-
-        {/* พื้นที่แสดงสถานการณ์ (Scenario Area) */}
-        <div className="flex-1 p-6 flex flex-col items-center justify-center bg-gradient-to-b from-emerald-900/20 to-slate-900">
-          
-          {/* ข้อมูล Pot & Bet */}
-          <div className="flex w-full gap-4 mb-8">
-            <div className="flex-1 bg-slate-800/80 rounded-xl p-3 border border-slate-700/50 text-center">
-              <span className="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">Pot Size</span>
-              <span className="text-2xl font-mono text-emerald-400">${mockScenario.potSize}</span>
-            </div>
-            <div className="flex-1 bg-slate-800/80 rounded-xl p-3 border border-slate-700/50 text-center">
-              <span className="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">Villain Bet</span>
-              <span className="text-2xl font-mono text-rose-400">${mockScenario.opponentBet}</span>
-            </div>
-          </div>
-
-          {/* ไพ่กองกลาง (Board) */}
-          <div className="mb-8 w-full text-center">
-            <span className="text-xs text-slate-500 uppercase tracking-widest mb-3 block">{mockScenario.street} Board</span>
-            <div className="flex gap-2 justify-center">
-              {mockScenario.board.map((card, i) => (
-                <div key={i} className="w-14 h-20 bg-white rounded-lg shadow-lg flex items-center justify-center text-xl font-bold text-slate-900 border-2 border-slate-200">
-                  {card}
+                        <div className="p-5 bg-slate-900 border-t border-slate-800 pb-10 sm:pb-5">
+                            <div className="flex flex-col gap-3">
+                                <button onClick={() => handleAction('RAISE')} className="w-full py-4 rounded-2xl font-black text-lg bg-rose-600 hover:bg-rose-500 text-white active:scale-[0.98] transition-transform shadow-lg">RAISE</button>
+                                <div className="flex gap-3">
+                                    <button onClick={() => handleAction('CALL')} className="flex-1 py-4 rounded-2xl font-bold text-lg bg-blue-600 hover:bg-blue-500 text-white active:scale-[0.98] transition-transform">CALL</button>
+                                    <button onClick={() => handleAction('FOLD')} className="flex-1 py-4 rounded-2xl font-bold text-lg bg-slate-700 hover:bg-slate-600 text-slate-200 active:scale-[0.98] transition-transform">FOLD</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              ))}
-            </div>
-          </div>
+            );
+        }
 
-          {/* ไพ่ในมือ (Hero) */}
-          <div className="mb-4 w-full text-center">
-             <span className="text-xs text-slate-500 uppercase tracking-widest mb-3 block">Hero Cards</span>
-             <div className="flex gap-2 justify-center">
-              {mockScenario.heroCards.map((card, i) => (
-                <div key={i} className="w-16 h-24 bg-white rounded-xl shadow-lg flex items-center justify-center text-2xl font-bold text-slate-900 border-2 border-slate-200">
-                  {card}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<PokerTrainerApp />);
+    </script>
+</body>
+</html>
 
-        {/* Feedback Modal / Toast (แสดงผลเมื่อกดปุ่ม) */}
-        {feedback && (
-          <div className={`p-5 mx-4 mb-4 rounded-2xl border ${feedback.isCorrect ? 'bg-emerald-950/50 border-emerald-800' : 'bg-rose-950/50 border-rose-800'}`}>
-            <h3 className={`text-base font-bold mb-2 ${feedback.isCorrect ? 'text-emerald-400' : 'text-rose-400'}`}>
-              {feedback.isCorrect ? '✅ Optimal Play' : '❌ Suboptimal Play'}
-            </h3>
-            <p className="text-slate-300 text-sm leading-relaxed mb-4">
-              {feedback.explanation}
-            </p>
-            <button onClick={() => setFeedback(null)} className="w-full py-2 bg-slate-800/50 rounded-lg text-sm text-slate-300 hover:bg-slate-700">
-              ลองอีกครั้ง
-            </button>
-          </div>
-        )}
-
-        {/* ปุ่มควบคุม (Action Controls - Mobile Optimized) */}
-        <div className="p-5 bg-slate-900 border-t border-slate-800 pb-10 sm:pb-5">
-          <div className="flex flex-col gap-3">
-            <button 
-              onClick={() => handleAction('RAISE')} 
-              className="w-full py-4 rounded-2xl font-black text-lg bg-rose-600 hover:bg-rose-500 text-white active:scale-[0.98] transition-transform shadow-lg shadow-rose-900/20"
-            >
-              RAISE
-            </button>
-            <div className="flex gap-3">
-              <button 
-                onClick={() => handleAction('CALL')} 
-                className="flex-1 py-4 rounded-2xl font-bold text-lg bg-blue-600 hover:bg-blue-500 text-white active:scale-[0.98] transition-transform shadow-lg shadow-blue-900/20"
-              >
-                CALL
-              </button>
-              <button 
-                onClick={() => handleAction('FOLD')} 
-                className="flex-1 py-4 rounded-2xl font-bold text-lg bg-slate-700 hover:bg-slate-600 text-slate-200 active:scale-[0.98] transition-transform"
-              >
-                FOLD
-              </button>
-            </div>
-          </div>
-        </div>
-        
-      </div>
-    </div>
-  );
-}
     
