@@ -1,150 +1,1636 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GTO Trainer (Mobile)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>GTO Poker Trainer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --felt: #0d1f12;
+      --felt-mid: #112318;
+      --felt-edge: #0a1a0e;
+      --gold: #c9a84c;
+      --gold-bright: #f0c94a;
+      --gold-dim: #7a6020;
+      --chip-red: #c0392b;
+      --chip-blue: #2471a3;
+      --text-main: #e8dfc0;
+      --text-dim: #8a7d5a;
+      --accent-green: #2ecc71;
+      --accent-red: #e74c3c;
+      --card-bg: #faf3e0;
+      --card-border: #d4b483;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--felt-edge);
+      color: var(--text-main);
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Felt texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.01) 0px, transparent 2px, transparent 4px),
+        repeating-linear-gradient(-45deg, rgba(255,255,255,0.01) 0px, transparent 2px, transparent 4px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app-container {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 0 0 32px;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(180deg, #0a1a0e 0%, var(--felt) 100%);
+      border-bottom: 2px solid var(--gold-dim);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--gold);
+      letter-spacing: 2px;
+      text-shadow: 0 0 20px rgba(201,168,76,0.4);
+    }
+
+    .logo span { color: var(--gold-bright); }
+
+    .badge {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      background: rgba(201,168,76,0.15);
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+      padding: 2px 8px;
+      border-radius: 2px;
+      letter-spacing: 1px;
+    }
+
+    /* ── Section Titles ── */
+    .section-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--gold-dim);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 16px 20px 8px;
+    }
+
+    /* ── Tab Bar ── */
+    .tab-bar {
+      display: flex;
+      background: var(--felt);
+      border-bottom: 1px solid rgba(201,168,76,0.2);
+      padding: 0 20px;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 1px;
+      padding: 10px 16px;
+      color: var(--text-dim);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+    }
+
+    /* ── Parser Panel ── */
+    .parser-panel {
+      padding: 16px 20px;
+    }
+
+    .hand-input {
+      width: 100%;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 6px;
+      color: var(--text-main);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      line-height: 1.6;
+      padding: 12px;
+      resize: vertical;
+      min-height: 160px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .hand-input:focus { border-color: var(--gold-dim); }
+    .hand-input::placeholder { color: var(--text-dim); opacity: 0.5; }
+
+    .parse-btn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      background: linear-gradient(135deg, #1a3a1f, #0f2614);
+      border: 1px solid var(--gold-dim);
+      border-radius: 6px;
+      color: var(--gold);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .parse-btn:hover {
+      background: linear-gradient(135deg, #1f4a26, #143318);
+      border-color: var(--gold);
+      box-shadow: 0 0 20px rgba(201,168,76,0.2);
+    }
+
+    .parse-btn:active { transform: scale(0.98); }
+
+    /* ── Parsed Info ── */
+    .parsed-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .stat-box {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+
+    .stat-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      color: var(--text-dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-family: 'Orbitron', monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gold-bright);
+    }
+
+    .stat-value.small { font-size: 12px; }
+
+    /* ── Felt Table ── */
+    .felt-table {
+      margin: 0 20px;
+      background: radial-gradient(ellipse at center, #1a3d20 0%, #0d2211 60%, #081508 100%);
+      border-radius: 60px;
+      border: 3px solid #2d4a30;
+      box-shadow:
+        inset 0 0 40px rgba(0,0,0,0.6),
+        0 4px 20px rgba(0,0,0,0.8),
+        0 0 0 4px #1a2e1d;
+      padding: 24px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .felt-table::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.03) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ── Playing Cards ── */
+    .cards-row {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      width: 44px;
+      height: 62px;
+      background: var(--card-bg);
+      border-radius: 5px;
+      border: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 2px 3px 8px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.8);
+      position: relative;
+      font-weight: 700;
+      transition: transform 0.3s;
+    }
+
+    .card.hero-card { border-color: var(--gold); box-shadow: 2px 3px 8px rgba(0,0,0,0.7), 0 0 12px rgba(201,168,76,0.5); }
+    .card.face-down { background: linear-gradient(135deg, #1a3a6e, #0d2147); border-color: #2a4a8e; }
+    .card.placeholder { background: rgba(0,0,0,0.2); border: 1px dashed rgba(201,168,76,0.2); }
+
+    .card-rank {
+      font-family: 'Georgia', serif;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .card-suit {
+      font-size: 14px;
+      line-height: 1;
+      margin-top: 1px;
+    }
+
+    .card.red .card-rank, .card.red .card-suit { color: #c0392b; }
+    .card.black .card-rank, .card.black .card-suit { color: #1a1a1a; }
+
+    .card-corner {
+      position: absolute;
+      top: 3px;
+      left: 4px;
+      font-size: 9px;
+      font-family: 'Georgia', serif;
+      line-height: 1.1;
+    }
+
+    .card.red .card-corner { color: #c0392b; }
+    .card.black .card-corner { color: #1a1a1a; }
+
+    .card-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(201,168,76,0.3);
+    }
+
+    /* Villain cards (back) */
+    .card-back-pattern {
+      width: 30px;
+      height: 42px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: repeating-linear-gradient(45deg, #1a3a6e, #1a3a6e 3px, #0d2147 3px, #0d2147 6px);
+    }
+
+    /* ── Street Labels ── */
+    .street-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      color: rgba(201,168,76,0.5);
+      letter-spacing: 2px;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    /* ── Pot Display ── */
+    .pot-display {
+      text-align: center;
+      margin: 12px 0;
+    }
+
+    .pot-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--gold-dim);
+      border-radius: 20px;
+      padding: 4px 14px;
+    }
+
+    .pot-chip-icon {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 8px rgba(201,168,76,0.6);
+    }
+
+    .pot-amount {
+      font-family: 'Orbitron', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gold-bright);
+    }
+
+    /* ── Villain Action ── */
+    .villain-action-bar {
+      background: rgba(192,57,43,0.15);
+      border: 1px solid rgba(192,57,43,0.35);
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin: 14px 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .villain-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: #e67e73;
+      letter-spacing: 1px;
+    }
+
+    .villain-bet {
+      font-family: 'Orbitron', monospace;
+      font-size: 15px;
+      font-weight: 700;
+      color: #e74c3c;
+    }
+
+    /* ── Math Panel ── */
+    .math-panel {
+      margin: 12px 20px 0;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+
+    .math-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .math-row:last-child { border-bottom: none; }
+
+    .math-key {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+    }
+
+    .math-val {
+      font-family: 'Orbitron', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gold-bright);
+    }
+
+    .math-val.green { color: var(--accent-green); }
+    .math-val.red { color: var(--accent-red); }
+
+    /* ── Action Buttons ── */
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      padding: 16px 20px;
+    }
+
+    .action-btn {
+      padding: 14px 8px;
+      border-radius: 8px;
+      border: none;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      transition: all 0.18s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .action-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.05);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .action-btn:hover::before { opacity: 1; }
+    .action-btn:active { transform: scale(0.96); }
+
+    .btn-fold {
+      background: linear-gradient(135deg, #3a1010, #200a0a);
+      border: 1px solid rgba(231,76,60,0.4);
+      color: #e74c3c;
+      box-shadow: 0 2px 12px rgba(231,76,60,0.2);
+    }
+
+    .btn-call {
+      background: linear-gradient(135deg, #0d2e0d, #071507);
+      border: 1px solid rgba(46,204,113,0.4);
+      color: #2ecc71;
+      box-shadow: 0 2px 12px rgba(46,204,113,0.2);
+    }
+
+    .btn-raise {
+      background: linear-gradient(135deg, #1a1a40, #0d0d22);
+      border: 1px solid rgba(155,89,182,0.5);
+      color: #9b59b6;
+      box-shadow: 0 2px 12px rgba(155,89,182,0.2);
+    }
+
+    .btn-icon { font-size: 18px; }
+    .btn-sublabel {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8px;
+      opacity: 0.6;
+      letter-spacing: 0;
+    }
+
+    /* ── Feedback Modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 100;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0 0 20px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal-sheet {
+      background: linear-gradient(180deg, #0f2214, #0a1a0e);
+      border: 1px solid var(--gold-dim);
+      border-radius: 16px 16px 12px 12px;
+      width: 100%;
+      max-width: 480px;
+      padding: 20px;
+      animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .verdict-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .verdict-icon.correct { background: rgba(46,204,113,0.2); border: 1px solid rgba(46,204,113,0.5); }
+    .verdict-icon.incorrect { background: rgba(231,76,60,0.2); border: 1px solid rgba(231,76,60,0.5); }
+    .verdict-icon.neutral { background: rgba(241,196,15,0.2); border: 1px solid rgba(241,196,15,0.5); }
+
+    .verdict-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .verdict-title.correct { color: var(--accent-green); }
+    .verdict-title.incorrect { color: var(--accent-red); }
+    .verdict-title.neutral { color: #f1c40f; }
+
+    .verdict-subtitle {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 2px;
+      letter-spacing: 1px;
+    }
+
+    .feedback-box {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+
+    .feedback-text {
+      font-size: 13px;
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    .ev-row {
+      display: flex;
+      justify-content: space-around;
+      margin: 10px 0;
+    }
+
+    .ev-card {
+      text-align: center;
+      padding: 8px 14px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.06);
+      flex: 1;
+      margin: 0 4px;
+    }
+
+    .ev-card-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+    }
+
+    .ev-card-value {
+      font-family: 'Orbitron', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .modal-close-btn {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #1a3a1f, #0f2614);
+      border: 1px solid var(--gold-dim);
+      border-radius: 8px;
+      color: var(--gold);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.2s;
+    }
+
+    .modal-close-btn:hover { border-color: var(--gold); box-shadow: 0 0 15px rgba(201,168,76,0.2); }
+
+    /* ── Scenario Library ── */
+    .scenario-card {
+      margin: 8px 20px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 8px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .scenario-card:hover {
+      border-color: var(--gold-dim);
+      background: rgba(201,168,76,0.05);
+    }
+
+    .scenario-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      padding: 2px 8px;
+      border-radius: 2px;
+      letter-spacing: 1px;
+    }
+
+    .tag-easy { background: rgba(46,204,113,0.2); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
+    .tag-medium { background: rgba(241,196,15,0.2); color: #f1c40f; border: 1px solid rgba(241,196,15,0.3); }
+    .tag-hard { background: rgba(231,76,60,0.2); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); }
+
+    .scenario-name {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-main);
+    }
+
+    .scenario-desc {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      color: var(--text-dim);
+      margin-top: 3px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Score Banner ── */
+    .score-banner {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 20px;
+      background: rgba(0,0,0,0.25);
+      border-bottom: 1px solid rgba(201,168,76,0.1);
+    }
+
+    .score-item { text-align: center; }
+
+    .score-num {
+      font-family: 'Orbitron', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gold-bright);
+    }
+
+    .score-lbl {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8px;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+    }
+
+    /* ── Street divider ── */
+    .street-section { margin-bottom: 10px; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+
+    /* ── Animations ── */
+    .card { animation: dealCard 0.3s ease backwards; }
+    @keyframes dealCard {
+      from { transform: translateY(-20px) rotate(-5deg); opacity: 0; }
+      to { transform: translateY(0) rotate(0); opacity: 1; }
+    }
+
+    .pulse-gold {
+      animation: pulseGold 2s ease-in-out infinite;
+    }
+
+    @keyframes pulseGold {
+      0%, 100% { box-shadow: 0 0 8px rgba(201,168,76,0.3); }
+      50% { box-shadow: 0 0 20px rgba(201,168,76,0.7); }
+    }
+
+    .gto-alert {
+      margin: 0 20px;
+      padding: 8px 12px;
+      background: rgba(241,196,15,0.1);
+      border: 1px solid rgba(241,196,15,0.3);
+      border-radius: 6px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: #f1c40f;
+      letter-spacing: 0.5px;
+      margin-top: 10px;
+    }
+  </style>
 </head>
-<body class="bg-slate-950 text-slate-200 font-sans">
+<body>
+<div id="root"></div>
 
-    <div id="root"></div>
+<script type="text/babel">
+const { useState, useCallback, useMemo } = React;
 
-    <script type="text/babel">
-        const { useState } = React;
+// ═══════════════════════════════════════════════════════════════
+// ██  SECTION 1: HAND HISTORY PARSER  ██
+// ═══════════════════════════════════════════════════════════════
+//
+// Supports N8/PokerCraft log format.
+// Extend RANK_MAP and SUIT_MAP for new formats.
+// Future: Add PKR, Stars, 888 format adapters here.
+//
+// ───────────────────────────────────────────────────────────────
 
-        // 1. ฐานข้อมูลสถานการณ์จำลอง (เพิ่มสถานการณ์ใหม่ๆ ตรงนี้ได้เลย)
-        const scenarios = [
-            {
-                id: 1,
-                heroCards: ['Ks', 'Qc'], board: ['Ah', '7d', '2s'],
-                potSize: 50, opponentBet: 75, street: 'FLOP',
-                explanation: {
-                    FOLD: { correct: true, text: "ถูกต้อง! โดน Overbet บนบอร์ด A-high ไพ่ K-high อ่อนเกินไป ควร FOLD ทิ้งไปเลย (+EV)" },
-                    CALL: { correct: false, text: "ผิด! การคอล Overbet ด้วยไพ่ที่สู้ยาก ขาดทุนระยะยาว (-EV)" },
-                    RAISE: { correct: false, text: "ผิด! เรสไปก็โดนคอลเฉพาะด้วยไพ่ที่แข็งกว่าเรา (เช่น A หรือเซ็ต)" }
-                }
-            },
-            {
-                id: 2,
-                heroCards: ['As', 'Ks'], board: ['Qs', 'Js', '2d'],
-                potSize: 60, opponentBet: 20, street: 'FLOP',
-                explanation: {
-                    FOLD: { correct: false, text: "ผิด! เรามีทั้ง Flush Draw และ Straight Draw (Monster Draw) ไพ่แข็งเกินกว่าจะหมอบ" },
-                    CALL: { correct: false, text: "พอรับได้ แต่ Passive ไปหน่อย เรามีโอกาสชนะสูง ควรเล่นดุดันกว่านี้" },
-                    RAISE: { correct: true, text: "ถูกต้อง! เรามี Combo Draw ที่แข็งแกร่งมาก การ RAISE สร้าง Fold Equity และขยาย Pot (+EV)" }
-                }
-            },
-            {
-                id: 3,
-                heroCards: ['8h', '8c'], board: ['8s', '4d', '2c'],
-                potSize: 40, opponentBet: 20, street: 'FLOP',
-                explanation: {
-                    FOLD: { correct: false, text: "ผิดมหันต์! เราติดตอง 8 (Top Set) ไพ่นัทแบบนี้หมอบไม่ได้!" },
-                    CALL: { correct: true, text: "ถูกต้อง! การดักคอล (Slowplay) ให้คู่แข่งหลงบลัฟต่อเป็นตัวเลือกที่ดีบนบอร์ดที่แห้งแบบนี้ (+EV)" },
-                    RAISE: { correct: false, text: "โอเค แต่บอร์ดแห้งมาก การ Raise ตอนนี้อาจทำให้เขาทิ้งไพ่บลัฟไปหมด อดได้เงินเพิ่ม" }
-                }
-            }
-        ];
+const RANK_MAP = { 'A':'A','K':'K','Q':'Q','J':'J','T':'T',
+  '10':'T','9':'9','8':'8','7':'7','6':'6','5':'5','4':'4','3':'3','2':'2' };
 
-        function PokerTrainerApp() {
-            // สร้าง State เพื่อจำว่าตอนนี้อยู่สถานการณ์ที่เท่าไหร่
-            const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
-            const [feedback, setFeedback] = useState(null);
+const SUIT_MAP = { 'h':'h','d':'d','c':'c','s':'s',
+  'H':'h','D':'d','C':'c','S':'s','♥':'h','♦':'d','♣':'c','♠':'s' };
 
-            const currentScenario = scenarios[currentScenarioIndex];
+// Card normalization
+// Input: "Ah", "Kd", "10s", "Ts", "♠A" etc.
+// Returns: { rank, suit } or null
+function parseCard(token) {
+  if (!token) return null;
+  token = token.trim().replace(/[[\]()]/g, '');
+  if (token.length < 2) return null;
 
-            const handleAction = (action) => {
-                // ดึงคำอธิบายตาม Action ที่กด
-                const result = currentScenario.explanation[action];
-                setFeedback({
-                    isCorrect: result.correct,
-                    explanation: result.text
-                });
-            };
+  // Handle "♠A" vs "Ah" formats
+  let rank, suit;
+  if (SUIT_MAP[token[0]]) {
+    suit = SUIT_MAP[token[0]];
+    rank = RANK_MAP[token.slice(1).toUpperCase()] || null;
+  } else {
+    // Try rank-first (most common)
+    if (token.length === 3 && token.startsWith('10')) {
+      rank = 'T';
+      suit = SUIT_MAP[token[2]] || null;
+    } else {
+      rank = RANK_MAP[token.slice(0, -1).toUpperCase()] || null;
+      suit = SUIT_MAP[token[token.length - 1]] || null;
+    }
+  }
+  if (!rank || !suit) return null;
+  return { rank, suit };
+}
 
-            const nextScenario = () => {
-                // เปลี่ยนไปสถานการณ์ถัดไป ถ้าหมดแล้วให้วนกลับมาอันแรก
-                const nextIndex = (currentScenarioIndex + 1) % scenarios.length;
-                setCurrentScenarioIndex(nextIndex);
-                setFeedback(null); // เคลียร์ผลลัพธ์
-            };
+// Main parser function.
+// ┌─────────────────────────────────────────────────────────────┐
+// │  INPUT: Raw hand history string from N8/PokerCraft          │
+// │  OUTPUT: ParsedHand object with all extracted fields        │
+// └─────────────────────────────────────────────────────────────┘
+function parseHandHistory(raw) {
+  const result = {
+    heroCards: [],      // [CardObj, CardObj]
+    boardCards: [],     // up to 5 CardObj
+    flop: [],
+    turn: null,
+    river: null,
+    potSize: 0,         // in chips
+    effectiveStack: 0,
+    villainBet: 0,
+    heroPosition: '',
+    street: 'preflop',  // preflop | flop | turn | river
+    handId: '',
+    parseErrors: [],
+  };
 
+  if (!raw || raw.trim().length < 10) {
+    result.parseErrors.push('Input too short or empty');
+    return result;
+  }
+
+  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+
+  // ── Hand ID ──
+  const idMatch = raw.match(/Hand\s*#?\s*(\w+)/i);
+  if (idMatch) result.handId = idMatch[1];
+
+  // ── Hero Cards (N8 format: "Dealt to Hero [Ah Kd]") ──
+  // Also handles: "Hero: [Ah Kd]", "Hole cards: Ah Kd"
+  const heroPatterns = [
+    /Dealt to\s+\w+\s*\[([^\]]+)\]/i,
+    /Hero[^:]*:\s*\[([^\]]+)\]/i,
+    /Hole cards[:\s]+([A-T2-9♠♥♦♣shdc]{2,8})/i,
+    /Hero has\s+([A-T2-9♠♥♦♣shdc\s]+)/i,
+  ];
+  for (const pat of heroPatterns) {
+    const m = raw.match(pat);
+    if (m) {
+      const tokens = m[1].trim().split(/\s+/);
+      result.heroCards = tokens.map(parseCard).filter(Boolean);
+      if (result.heroCards.length >= 2) break;
+    }
+  }
+
+  // ── Board Cards ──
+  // Flop: "*** FLOP *** [2h 7c Ks]"
+  const flopMatch = raw.match(/FLOP[^[]*\[([^\]]+)\]/i);
+  if (flopMatch) {
+    const tokens = flopMatch[1].trim().split(/\s+/);
+    result.flop = tokens.map(parseCard).filter(Boolean);
+    result.boardCards = [...result.flop];
+    result.street = 'flop';
+  }
+
+  // Turn: "*** TURN *** [2h 7c Ks] [Ah]"
+  const turnMatch = raw.match(/TURN[^[]*\[[^\]]+\]\s*\[([^\]]+)\]/i);
+  if (turnMatch) {
+    result.turn = parseCard(turnMatch[1].trim().split(/\s+/)[0]);
+    if (result.turn) { result.boardCards.push(result.turn); result.street = 'turn'; }
+  }
+
+  // River: "*** RIVER *** [2h 7c Ks Ah] [Td]"
+  const riverMatch = raw.match(/RIVER[^[]*\[[^\]]+\]\s*\[([^\]]+)\]/i);
+  if (riverMatch) {
+    result.river = parseCard(riverMatch[1].trim().split(/\s+/)[0]);
+    if (result.river) { result.boardCards.push(result.river); result.street = 'river'; }
+  }
+
+  // ── Pot Size ──
+  // Try "Total pot: 450" or "Pot: 450" or "pot of 450"
+  const potPatterns = [
+    /Total pot[:\s]+(\d+(?:\.\d+)?)/i,
+    /Pot[:\s]+(\d+(?:\.\d+)?)/i,
+    /pot of\s+(\d+(?:\.\d+)?)/i,
+    /Main pot\s+(\d+(?:\.\d+)?)/i,
+  ];
+  for (const pat of potPatterns) {
+    const m = raw.match(pat);
+    if (m) { result.potSize = parseFloat(m[1]); break; }
+  }
+
+  // ── Effective Stack ──
+  const stackPatterns = [
+    /Effective stack[:\s]+(\d+(?:\.\d+)?)/i,
+    /Stack[:\s]+(\d+(?:\.\d+)?)/i,
+    /Hero.*?(\d+(?:\.\d+)?)\s*(?:chips|BB)/i,
+  ];
+  for (const pat of stackPatterns) {
+    const m = raw.match(pat);
+    if (m) { result.effectiveStack = parseFloat(m[1]); break; }
+  }
+
+  // ── Villain Bet ──
+  // "Villain bets 200", "raises to 350", "bets 75"
+  // We grab the LAST bet/raise action before hero acts
+  const betPatterns = [
+    /(?:Villain|OOP|IP|BTN|BB|SB|UTG|HJ|CO|MP)\s+bets\s+(\d+(?:\.\d+)?)/i,
+    /(?:Villain|OOP|IP|BTN|BB|SB|UTG|HJ|CO|MP)\s+raises?\s+to\s+(\d+(?:\.\d+)?)/i,
+    /bets\s+(\d+(?:\.\d+)?)/i,
+    /raises?\s+to\s+(\d+(?:\.\d+)?)/i,
+  ];
+  for (const pat of betPatterns) {
+    const allMatches = [...raw.matchAll(new RegExp(pat.source, 'gi'))];
+    if (allMatches.length > 0) {
+      const last = allMatches[allMatches.length - 1];
+      result.villainBet = parseFloat(last[1]);
+      break;
+    }
+  }
+
+  // ── Position ──
+  const posMatch = raw.match(/Hero[^(]*\(([^)]+)\)/i);
+  if (posMatch) result.heroPosition = posMatch[1].trim();
+
+  return result;
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// ██  SECTION 2: POKER MATH ENGINE  ██
+// ═══════════════════════════════════════════════════════════════
+//
+// All EV calculations live here. This is the layer to extend with:
+// - Equity calculators (Monte Carlo / exact enumeration)
+// - Bayes' Theorem for range updates
+// - MDF (Minimum Defense Frequency) checks
+// - ICM adjustments for tournament play
+//
+// ───────────────────────────────────────────────────────────────
+
+function calculatePotOdds(potSize, villainBet) {
+  // Pot Odds = Call Amount / (Pot + Call Amount)
+  // This is the BREAK-EVEN equity needed to call profitably.
+  if (villainBet <= 0) return { ratio: '—', percentage: 0, callAmount: 0 };
+  const callAmount = villainBet;
+  const totalPot = potSize + callAmount;
+  const percentage = (callAmount / totalPot) * 100;
+  const ratio = `${Math.round(potSize / callAmount)}:1`;
+  return { ratio, percentage: parseFloat(percentage.toFixed(1)), callAmount };
+}
+
+function calculateMDF(villainBet, potSize) {
+  // Minimum Defense Frequency = Pot / (Pot + Bet)
+  // How often Hero must not-fold to prevent villain from auto-profiting.
+  if (villainBet <= 0) return 0;
+  return parseFloat(((potSize / (potSize + villainBet)) * 100).toFixed(1));
+}
+
+function calculateBetSizingClass(villainBet, potSize) {
+  // Bet size relative to pot
+  if (potSize === 0) return 'unknown';
+  const ratio = villainBet / potSize;
+  if (ratio >= 1.0) return 'overpot';
+  if (ratio >= 0.75) return 'large';
+  if (ratio >= 0.5) return 'half';
+  if (ratio >= 0.33) return 'third';
+  return 'small';
+}
+
+// ┌─────────────────────────────────────────────────────────────┐
+// │  GTO Evaluation Engine                                      │
+// │  Input: parsed hand + user action                           │
+// │  Output: { verdict, correctAction, explanation, ev }        │
+// │                                                             │
+// │  FUTURE EXPANSION:                                          │
+// │  - Replace placeholderHandStrength with actual equity calc  │
+// │  - Insert Bayes range narrowing after each street card      │
+// │  - Add solver-imported GTO strategies per spot              │
+// └─────────────────────────────────────────────────────────────┘
+function evaluateAction(parsedHand, userAction, handStrength, boardTexture) {
+  const { potSize, villainBet, boardCards } = parsedHand;
+  const potOdds = calculatePotOdds(potSize, villainBet);
+  const mdf = calculateMDF(villainBet, potSize);
+  const betClass = calculateBetSizingClass(villainBet, potSize);
+
+  // ── Placeholder hand strength mapping ──
+  // In production: replace with equity vs villain range using Monte Carlo.
+  const STRENGTH_EQUITY = {
+    'top_pair_top_kicker': 72,
+    'top_pair': 62,
+    'second_pair': 40,
+    'third_pair': 28,
+    'overpair': 78,
+    'two_pair': 82,
+    'set': 90,
+    'flush_draw': 35,
+    'straight_draw': 30,
+    'air': 12,
+    'bluff_catcher': 38,
+  };
+
+  const equity = STRENGTH_EQUITY[handStrength] || 40;
+
+  // ── Core GTO Decision Logic ──
+  // Principle: Call if Equity > Pot Odds %, Fold otherwise (pure EV)
+  // Raise if we have significant equity advantage over villain's range.
+  //
+  // TODO (Bayes): After each action, update villain's perceived range.
+  // e.g. villain overpot on Ace-high board → range is polarized →
+  //      bluff catcher EV = (mdf/100 * pot) - ((1-mdf/100) * call)
+
+  let correctAction, reasoning, verdict;
+  const needsEquity = potOdds.percentage;
+  const hasEquity = equity;
+
+  // Special rule: Overpot polarizes villain's range → higher fold threshold
+  if (betClass === 'overpot') {
+    // Villain is either very strong or bluffing. Pure EV math:
+    // EV(call) = equity * (pot + bet) - (1 - equity) * bet
+    const evCall = (hasEquity / 100) * (potSize + villainBet) - ((1 - hasEquity / 100) * villainBet);
+    const evFold = 0;
+
+    if (hasEquity < 35) {
+      correctAction = 'FOLD';
+      reasoning = `Villain's overpot bet (${Math.round((villainBet/potSize)*100)}% of pot) polarizes their range to very strong hands or bluffs. With ${handStrength.replace(/_/g,' ')} (est. equity ~${hasEquity}%), you only need ${needsEquity}% equity to call. You're below that threshold. EV(call) ≈ ${evCall.toFixed(0)} chips — fold is correct.`;
+    } else if (hasEquity >= 70) {
+      correctAction = 'RAISE';
+      reasoning = `With ${handStrength.replace(/_/g,' ')} (est. ~${hasEquity}% equity) vs an overpot, raising is the highest-EV line. You're ahead of villain's bluff range and charging their draws. EV(raise) > EV(call).`;
+    } else {
+      correctAction = 'CALL';
+      reasoning = `Pot odds require ${needsEquity}% equity. Your estimated equity is ~${hasEquity}%, putting you slightly above the breakeven threshold. Calling is defensible; raising is occasionally correct if you're at the top of your range. MDF = ${mdf}% — you must defend at least this often.`;
+    }
+  } else if (betClass === 'large' || betClass === 'half') {
+    if (hasEquity < needsEquity) {
+      correctAction = 'FOLD';
+      reasoning = `Required pot odds equity: ${needsEquity}%. Your estimated equity with ${handStrength.replace(/_/g,' ')}: ~${hasEquity}%. EV(call) is negative. Folding preserves EV.`;
+    } else if (hasEquity >= 70) {
+      correctAction = 'RAISE';
+      reasoning = `Your ${handStrength.replace(/_/g,' ')} (~${hasEquity}% equity) is strong enough to raise for value. Calling is also fine, but raising with your best hands builds pot when ahead and denies equity to draws.`;
+    } else {
+      correctAction = 'CALL';
+      reasoning = `Your equity (~${hasEquity}%) exceeds pot odds (${needsEquity}%). EV(call) > 0. You're in a mandatory call spot. MDF = ${mdf}% — defend to prevent villain from over-exploiting.`;
+    }
+  } else {
+    // Small bets — wide defense range
+    if (hasEquity < 25) {
+      correctAction = 'FOLD';
+      reasoning = `Even with a small bet (${Math.round((villainBet/potSize)*100)}% pot), your hand (${handStrength.replace(/_/g,' ')}, ~${hasEquity}% equity) is below the ${needsEquity}% required. Fold and wait for better spots.`;
+    } else {
+      correctAction = 'CALL';
+      reasoning = `Small bet size means wide MDF (${mdf}%). You must defend very frequently. ${handStrength.replace(/_/g,' ')} (~${hasEquity}% equity) clears the ${needsEquity}% pot odds bar easily. Calling (or raising as a semi-bluff) is correct.`;
+    }
+  }
+
+  verdict = userAction === correctAction ? 'correct' : 'incorrect';
+
+  // ── EV of each action ──
+  // Simplified EV model — replace with solver ranges for precision.
+  const evCall = parseFloat(((equity / 100) * (potSize + villainBet) - ((1 - equity / 100) * villainBet)).toFixed(0));
+  const evFold = 0;
+  const evRaise = parseFloat((correctAction === 'RAISE' ? evCall * 1.15 : evCall * 0.85).toFixed(0));
+
+  return {
+    verdict,
+    correctAction,
+    reasoning,
+    potOdds,
+    mdf,
+    betClass,
+    equity,
+    ev: { fold: evFold, call: evCall, raise: evRaise },
+  };
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// ██  SECTION 3: CARD RENDERING COMPONENT  ██
+// ═══════════════════════════════════════════════════════════════
+
+const SUIT_SYMBOLS = { h: '♥', d: '♦', c: '♣', s: '♠' };
+const SUIT_COLORS = { h: 'red', d: 'red', c: 'black', s: 'black' };
+
+function PlayingCard({ card, delay = 0, isHero = false }) {
+  if (!card) {
+    return <div className="card placeholder" style={{ animationDelay: `${delay}s` }}>
+      <div className="card-dot" />
+    </div>;
+  }
+  const sym = SUIT_SYMBOLS[card.suit] || '?';
+  const color = SUIT_COLORS[card.suit] || 'black';
+  return (
+    <div className={`card ${color} ${isHero ? 'hero-card' : ''}`} style={{ animationDelay: `${delay * 0.1}s` }}>
+      <div className="card-corner">{card.rank}<br/>{sym}</div>
+      <div className="card-rank">{card.rank}</div>
+      <div className="card-suit">{sym}</div>
+    </div>
+  );
+}
+
+function VillainCardBack() {
+  return (
+    <div className="card face-down">
+      <div className="card-back-pattern" />
+    </div>
+  );
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// ██  SECTION 4: FEEDBACK MODAL  ██
+// ═══════════════════════════════════════════════════════════════
+
+function FeedbackModal({ result, userAction, onClose }) {
+  if (!result) return null;
+  const { verdict, correctAction, reasoning, potOdds, mdf, ev, equity, betClass } = result;
+
+  const verdictConfig = {
+    correct: { icon: '✓', label: 'CORRECT PLAY', color: 'correct' },
+    incorrect: { icon: '✗', label: 'SUBOPTIMAL LINE', color: 'incorrect' },
+    neutral: { icon: '≈', label: 'MARGINAL SPOT', color: 'neutral' },
+  };
+  const cfg = verdictConfig[verdict] || verdictConfig.neutral;
+
+  const betClassLabel = {
+    overpot: 'OVER-POT', large: 'LARGE (75%+)', half: 'HALF-POT',
+    third: 'THIRD-POT', small: 'SMALL (<33%)', unknown: 'UNKNOWN'
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-sheet" onClick={e => e.stopPropagation()}>
+
+        {/* Header */}
+        <div className="modal-header">
+          <div className={`verdict-icon ${cfg.color}`}>{cfg.icon}</div>
+          <div>
+            <div className={`verdict-title ${cfg.color}`}>{cfg.label}</div>
+            <div className="verdict-subtitle">
+              YOUR ACTION: {userAction} · OPTIMAL: {correctAction}
+            </div>
+          </div>
+        </div>
+
+        {/* EV Comparison */}
+        <div className="ev-row">
+          {[
+            { label: 'EV FOLD', value: ev.fold, action: 'FOLD' },
+            { label: 'EV CALL', value: ev.call, action: 'CALL' },
+            { label: 'EV RAISE', value: ev.raise, action: 'RAISE' },
+          ].map(({ label, value, action }) => {
+            const isBest = action === correctAction;
+            const color = value > 0 ? '#2ecc71' : value < 0 ? '#e74c3c' : '#f1c40f';
             return (
-                <div className="min-h-screen flex flex-col items-center sm:py-12">
-                    <div className="w-full max-w-md bg-slate-900 sm:rounded-3xl shadow-2xl border-x sm:border-y border-slate-800 flex flex-col min-h-screen sm:min-h-0">
-                        
-                        <div className="bg-slate-800 p-5 sm:rounded-t-3xl border-b border-slate-700 text-center flex justify-between items-center">
-                            <h1 className="text-xl font-bold text-white tracking-tight">GTO Trainer</h1>
-                            <span className="text-xs bg-slate-700 px-2 py-1 rounded text-slate-300">Hand {currentScenarioIndex + 1}/{scenarios.length}</span>
-                        </div>
-                        
-                        <div className="flex-1 p-6 flex flex-col items-center justify-center bg-gradient-to-b from-emerald-900/20 to-slate-900">
-                            <div className="flex w-full gap-4 mb-8">
-                                <div className="flex-1 bg-slate-800/80 rounded-xl p-3 border border-slate-700/50 text-center">
-                                    <span className="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">Pot Size</span>
-                                    <span className="text-2xl font-mono text-emerald-400">${currentScenario.potSize}</span>
-                                </div>
-                                <div className="flex-1 bg-slate-800/80 rounded-xl p-3 border border-slate-700/50 text-center">
-                                    <span className="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">Villain Bet</span>
-                                    <span className="text-2xl font-mono text-rose-400">${currentScenario.opponentBet}</span>
-                                </div>
-                            </div>
-
-                            <div className="mb-8 w-full text-center">
-                                <span className="text-xs text-slate-500 uppercase tracking-widest mb-3 block">{currentScenario.street} Board</span>
-                                <div className="flex gap-2 justify-center">
-                                    {currentScenario.board.map((card, i) => (
-                                        <div key={i} className="w-14 h-20 bg-white rounded-lg shadow-lg flex items-center justify-center text-xl font-bold text-slate-900 border-2 border-slate-200">{card}</div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="mb-4 w-full text-center">
-                                <span className="text-xs text-slate-500 uppercase tracking-widest mb-3 block">Hero Cards</span>
-                                <div className="flex gap-2 justify-center">
-                                    {currentScenario.heroCards.map((card, i) => (
-                                        <div key={i} className="w-16 h-24 bg-white rounded-xl shadow-lg flex items-center justify-center text-2xl font-bold text-slate-900 border-2 border-slate-200">{card}</div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* แสดงผลลัพธ์และปุ่มเล่นตาถัดไป */}
-                        {feedback && (
-                            <div className={`p-5 mx-4 mb-4 rounded-2xl border ${feedback.isCorrect ? 'bg-emerald-950/50 border-emerald-800' : 'bg-rose-950/50 border-rose-800'}`}>
-                                <h3 className={`text-base font-bold mb-2 ${feedback.isCorrect ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                    {feedback.isCorrect ? '✅ Good Decision' : '❌ Bad Decision'}
-                               </h3>
-                                <p className="text-slate-300 text-sm leading-relaxed mb-4">{feedback.explanation}</p>
-                                <button onClick={nextScenario} className="w-full py-3 bg-white text-slate-900 font-bold rounded-lg hover:bg-slate-200 active:scale-[0.98] transition-transform">
-                                    เล่นตาถัดไป (Next Hand) ➡️
-                                </button>
-                            </div>
-                        )}
-
-                        {/* ซ่อนปุ่ม Action หากกดเลือกไปแล้ว เพื่อบังคับให้อ่านผลลัพธ์ */}
-                        {!feedback && (
-                            <div className="p-5 bg-slate-900 border-t border-slate-800 pb-10 sm:pb-5">
-                                <div className="flex flex-col gap-3">
-                                    <button onClick={() => handleAction('RAISE')} className="w-full py-4 rounded-2xl font-black text-lg bg-rose-600 hover:bg-rose-500 text-white active:scale-[0.98] transition-transform shadow-lg">RAISE</button>
-                                    <div className="flex gap-3">
-                                        <button onClick={() => handleAction('CALL')} className="flex-1 py-4 rounded-2xl font-bold text-lg bg-blue-600 hover:bg-blue-500 text-white active:scale-[0.98] transition-transform">CALL</button>
-                                        <button onClick={() => handleAction('FOLD')} className="flex-1 py-4 rounded-2xl font-bold text-lg bg-slate-700 hover:bg-slate-600 text-slate-200 active:scale-[0.98] transition-transform">FOLD</button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
+              <div key={label} className="ev-card" style={isBest ? { borderColor: 'rgba(201,168,76,0.4)', background: 'rgba(201,168,76,0.06)' } : {}}>
+                <div className="ev-card-label">{label}</div>
+                <div className="ev-card-value" style={{ color }}>
+                  {value > 0 ? '+' : ''}{value}
                 </div>
+              </div>
             );
-        }
+          })}
+        </div>
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<PokerTrainerApp />);
-    </script>
+        {/* Math breakdown */}
+        <div className="feedback-box" style={{ marginTop: 10 }}>
+          <div className="math-row">
+            <span className="math-key">POT ODDS REQUIRED</span>
+            <span className="math-val">{potOdds.percentage}%</span>
+          </div>
+          <div className="math-row">
+            <span className="math-key">EST. EQUITY vs RANGE</span>
+            <span className="math-val" style={{ color: equity >= potOdds.percentage ? '#2ecc71' : '#e74c3c' }}>{equity}%</span>
+          </div>
+          <div className="math-row">
+            <span className="math-key">MIN DEFENSE FREQ</span>
+            <span className="math-val">{mdf}%</span>
+          </div>
+          <div className="math-row">
+            <span className="math-key">BET SIZE CLASS</span>
+            <span className="math-val small">{betClassLabel[betClass]}</span>
+          </div>
+        </div>
+
+        {/* Reasoning */}
+        <div className="feedback-box">
+          <p className="feedback-text">{reasoning}</p>
+        </div>
+
+        {/* Bayes placeholder note */}
+        <div style={{ padding: '6px 2px', marginBottom: 8 }}>
+          <p style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 9, color: 'rgba(201,168,76,0.4)', letterSpacing: '0.5px' }}>
+            // TODO: Insert Bayes range update here → villain bet class "{betClass}" narrows range probability distribution.
+          </p>
+        </div>
+
+        <button className="modal-close-btn" onClick={onClose}>CONTINUE TRAINING</button>
+      </div>
+    </div>
+  );
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// ██  SECTION 5: PRESET SCENARIO LIBRARY  ██
+// ═══════════════════════════════════════════════════════════════
+//
+// Preset training scenarios for offline drilling.
+// Format compatible with the parser output schema.
+// Add more spots: 3-bet pots, multi-way, wet boards, etc.
+//
+// ───────────────────────────────────────────────────────────────
+
+const PRESET_SCENARIOS = [
+  {
+    id: 1,
+    name: 'Overpot on Ace-High Board',
+    difficulty: 'easy',
+    description: 'Villain bets 300 into 200 on A♠7♦2♣',
+    handStrength: 'second_pair',
+    boardTexture: 'dry',
+    raw: `Hand #001
+Dealt to Hero [7h 6d]
+*** FLOP *** [As 7d 2c]
+Pot: 200
+Villain bets 300
+Effective stack: 800`,
+  },
+  {
+    id: 2,
+    name: 'Half-Pot with Top Pair',
+    difficulty: 'easy',
+    description: 'You hit top pair, villain c-bets half-pot',
+    handStrength: 'top_pair_top_kicker',
+    boardTexture: 'dry',
+    raw: `Hand #002
+Dealt to Hero [Ks Qh]
+*** FLOP *** [Kd 8c 3h]
+Pot: 120
+Villain bets 60
+Effective stack: 600`,
+  },
+  {
+    id: 3,
+    name: 'Flush Draw vs Large Bet',
+    difficulty: 'medium',
+    description: 'Nut flush draw facing 75% pot on wet board',
+    handStrength: 'flush_draw',
+    boardTexture: 'wet',
+    raw: `Hand #003
+Dealt to Hero [Ah 5h]
+*** FLOP *** [Kh 9h 2d]
+*** TURN *** [Kh 9h 2d] [Jc]
+Pot: 400
+Villain bets 300
+Effective stack: 1200`,
+  },
+  {
+    id: 4,
+    name: 'Set vs River Overbet',
+    difficulty: 'hard',
+    description: 'Bottom set on dangerous river, villain overbets',
+    handStrength: 'set',
+    boardTexture: 'dynamic',
+    raw: `Hand #004
+Dealt to Hero [2c 2d]
+*** FLOP *** [2h Ks Qd]
+*** TURN *** [2h Ks Qd] [Jh]
+*** RIVER *** [2h Ks Qd Jh] [Th]
+Pot: 600
+Villain bets 750
+Effective stack: 2000`,
+  },
+  {
+    id: 5,
+    name: 'Bluff Catcher on Blank River',
+    difficulty: 'hard',
+    description: 'Third pair facing small river bet',
+    handStrength: 'bluff_catcher',
+    boardTexture: 'dry',
+    raw: `Hand #005
+Dealt to Hero [8h 8d]
+*** FLOP *** [Ac Kd 9s]
+*** TURN *** [Ac Kd 9s] [2c]
+*** RIVER *** [Ac Kd 9s 2c] [5h]
+Pot: 500
+Villain bets 100
+Effective stack: 1500`,
+  },
+];
+
+const HAND_STRENGTHS = [
+  { value: 'top_pair_top_kicker', label: 'Top Pair Top Kicker (TPTK)' },
+  { value: 'top_pair', label: 'Top Pair' },
+  { value: 'second_pair', label: 'Second Pair' },
+  { value: 'third_pair', label: 'Third Pair / Low Pair' },
+  { value: 'overpair', label: 'Overpair' },
+  { value: 'two_pair', label: 'Two Pair' },
+  { value: 'set', label: 'Set / Trips' },
+  { value: 'flush_draw', label: 'Flush Draw' },
+  { value: 'straight_draw', label: 'Straight Draw (OESD/GS)' },
+  { value: 'bluff_catcher', label: 'Bluff Catcher' },
+  { value: 'air', label: 'Air / No Made Hand' },
+];
+
+
+// ═══════════════════════════════════════════════════════════════
+// ██  SECTION 6: MAIN APP COMPONENT  ██
+// ═══════════════════════════════════════════════════════════════
+
+function App() {
+  const [activeTab, setActiveTab] = useState('train');    // train | parse | library
+  const [rawInput, setRawInput] = useState('');
+  const [parsedHand, setParsedHand] = useState(null);
+  const [handStrength, setHandStrength] = useState('second_pair');
+  const [feedbackResult, setFeedbackResult] = useState(null);
+  const [userAction, setUserAction] = useState(null);
+  const [score, setScore] = useState({ correct: 0, total: 0 });
+  const [parseError, setParseError] = useState('');
+
+  // ── Parse handler ──
+  const handleParse = useCallback(() => {
+    setParseError('');
+    const hand = parseHandHistory(rawInput);
+    if (hand.parseErrors.length > 0 && hand.heroCards.length === 0) {
+      setParseError('Could not parse hero cards. Check format.');
+    }
+    setParsedHand(hand);
+    setFeedbackResult(null);
+    setUserAction(null);
+    if (hand.potSize > 0 || hand.heroCards.length > 0) {
+      setActiveTab('train');
+    }
+  }, [rawInput]);
+
+  // ── Load preset scenario ──
+  const loadScenario = useCallback((scenario) => {
+    setRawInput(scenario.raw);
+    const hand = parseHandHistory(scenario.raw);
+    setParsedHand(hand);
+    setHandStrength(scenario.handStrength);
+    setFeedbackResult(null);
+    setUserAction(null);
+    setActiveTab('train');
+  }, []);
+
+  // ── Action handler ──
+  const handleAction = useCallback((action) => {
+    if (!parsedHand) return;
+    const result = evaluateAction(parsedHand, action, handStrength, 'dry');
+    setFeedbackResult(result);
+    setUserAction(action);
+    setScore(prev => ({
+      correct: prev.correct + (result.verdict === 'correct' ? 1 : 0),
+      total: prev.total + 1,
+    }));
+  }, [parsedHand, handStrength]);
+
+  const handleCloseModal = useCallback(() => {
+    setFeedbackResult(null);
+    setUserAction(null);
+  }, []);
+
+  // ── Derived math ──
+  const potOdds = useMemo(() => {
+    if (!parsedHand) return null;
+    return calculatePotOdds(parsedHand.potSize, parsedHand.villainBet);
+  }, [parsedHand]);
+
+  const mdf = useMemo(() => {
+    if (!parsedHand) return 0;
+    return calculateMDF(parsedHand.villainBet, parsedHand.potSize);
+  }, [parsedHand]);
+
+  const accuracy = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
+  const streetLabel = parsedHand?.street?.toUpperCase() || '—';
+
+  return (
+    <div className="app-container">
+
+      {/* Header */}
+      <header className="header">
+        <div className="logo">GTO<span>TRAINER</span></div>
+        <div className="badge">v1.0 MVP</div>
+      </header>
+
+      {/* Score Banner */}
+      <div className="score-banner">
+        <div className="score-item">
+          <div className="score-num">{score.correct}</div>
+          <div className="score-lbl">CORRECT</div>
+        </div>
+        <div className="score-item">
+          <div className="score-num">{score.total}</div>
+          <div className="score-lbl">HANDS</div>
+        </div>
+        <div className="score-item">
+          <div className="score-num" style={{ color: accuracy >= 70 ? '#2ecc71' : accuracy >= 50 ? '#f1c40f' : '#e74c3c' }}>
+            {accuracy}%
+          </div>
+          <div className="score-lbl">ACCURACY</div>
+        </div>
+      </div>
+
+      {/* Tab Bar */}
+      <div className="tab-bar">
+        {[
+          { id: 'train', label: '▶ TRAINER' },
+          { id: 'parse', label: '⌨ PARSER' },
+          { id: 'library', label: '☰ LIBRARY' },
+        ].map(t => (
+          <button key={t.id} className={`tab-btn ${activeTab === t.id ? 'active' : ''}`}
+            onClick={() => setActiveTab(t.id)}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── TAB: TRAINER ── */}
+      {activeTab === 'train' && (
+        <>
+          {!parsedHand ? (
+            <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+              <div style={{ fontFamily: "'Orbitron', monospace", fontSize: 12, color: 'var(--gold-dim)', letterSpacing: 2 }}>
+                NO HAND LOADED
+              </div>
+              <p style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 11, color: 'var(--text-dim)', marginTop: 10 }}>
+                Go to PARSER tab to input a hand,<br/>or LIBRARY to load a preset scenario.
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Street indicator */}
+              <p className="section-title">
+                SCENARIO · {streetLabel} · {parsedHand.handId ? `HAND #${parsedHand.handId}` : 'CUSTOM'}
+              </p>
+
+              {/* Board — Felt Table */}
+              <div className="felt-table">
+                {/* Villain */}
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 14 }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div className="street-label">VILLAIN</div>
+                    <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+                      <VillainCardBack />
+                      <VillainCardBack />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Board Cards */}
+                <div className="street-section">
+                  <div className="street-label">BOARD</div>
+                  <div className="cards-row">
+                    {parsedHand.flop.map((c, i) => <PlayingCard key={`f${i}`} card={c} delay={i} />)}
+                    {parsedHand.flop.length < 3 && Array(3 - parsedHand.flop.length).fill(null).map((_, i) =>
+                      <PlayingCard key={`fp${i}`} card={null} />)}
+                    {/* Turn */}
+                    <div style={{ width: 6 }} />
+                    <PlayingCard card={parsedHand.turn} delay={3} />
+                    {/* River */}
+                    <div style={{ width: 6 }} />
+                    <PlayingCard card={parsedHand.river} delay={4} />
+                  </div>
+                </div>
+
+                {/* Pot */}
+                <div className="pot-display">
+                  <div className="pot-chip pulse-gold">
+                    <div className="pot-chip-icon" />
+                    <span className="pot-amount">
+                      POT: {parsedHand.potSize > 0 ? parsedHand.potSize.toLocaleString() : '—'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Hero Cards */}
+                <div className="street-section">
+                  <div className="street-label">YOUR HAND</div>
+                  <div className="cards-row">
+                    {parsedHand.heroCards.length > 0
+                      ? parsedHand.heroCards.map((c, i) => <PlayingCard key={`h${i}`} card={c} delay={i} isHero={true} />)
+                      : [0,1].map(i => <PlayingCard key={`hp${i}`} card={null} />)
+                    }
+                  </div>
+                </div>
+              </div>
+
+              {/* Villain Action */}
+              {parsedHand.villainBet > 0 && (
+                <div className="villain-action-bar">
+                  <div>
+                    <div className="villain-tag">VILLAIN BETS</div>
+                    <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 9, color: 'var(--text-dim)', marginTop: 2 }}>
+                      {potOdds && `${Math.round((parsedHand.villainBet / parsedHand.potSize) * 100)}% of pot`}
+                    </div>
+                  </div>
+                  <div className="villain-bet">{parsedHand.villainBet.toLocaleString()}</div>
+                </div>
+              )}
+
+              {/* Math Panel */}
+              {potOdds && (
+                <div className="math-panel">
+                  <div className="math-row">
+                    <span className="math-key">POT ODDS</span>
+                    <span className="math-val">{potOdds.ratio} ({potOdds.percentage}%)</span>
+                  </div>
+                  <div className="math-row">
+                    <span className="math-key">MIN DEFENSE FREQ</span>
+                    <span className="math-val">{mdf}%</span>
+                  </div>
+                  <div className="math-row">
+                    <span className="math-key">EFFECTIVE STACK</span>
+                    <span className="math-val">{parsedHand.effectiveStack > 0 ? parsedHand.effectiveStack.toLocaleString() : '—'}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Hand Strength Selector */}
+              <div style={{ padding: '12px 20px 0' }}>
+                <div className="section-title" style={{ padding: '0 0 6px' }}>YOUR HAND STRENGTH</div>
+                <select
+                  value={handStrength}
+                  onChange={e => setHandStrength(e.target.value)}
+                  style={{
+                    width: '100%',
+                    background: 'rgba(0,0,0,0.4)',
+                    border: '1px solid rgba(201,168,76,0.25)',
+                    borderRadius: 6,
+                    color: 'var(--gold)',
+                    fontFamily: "'Share Tech Mono', monospace",
+                    fontSize: 11,
+                    padding: '10px 12px',
+                    outline: 'none',
+                    cursor: 'pointer',
+                    letterSpacing: '0.5px',
+                  }}>
+                  {HAND_STRENGTHS.map(h => (
+                    <option key={h.value} value={h.value} style={{ background: '#0d1f12' }}>{h.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="gto-alert">
+                ⚡ Select your hand strength above, then choose an action below. GTO analysis will follow.
+              </div>
+
+              {/* Action Buttons */}
+              <div className="action-row">
+                <button className="action-btn btn-fold" onClick={() => handleAction('FOLD')}>
+                  <span className="btn-icon">✗</span>
+                  FOLD
+                  <span className="btn-sublabel">give up</span>
+                </button>
+                <button className="action-btn btn-call" onClick={() => handleAction('CALL')}>
+                  <span className="btn-icon">✓</span>
+                  CALL
+                  <span className="btn-sublabel">{parsedHand.villainBet > 0 ? parsedHand.villainBet : '—'}</span>
+                </button>
+                <button className="action-btn btn-raise" onClick={() => handleAction('RAISE')}>
+                  <span className="btn-icon">↑</span>
+                  RAISE
+                  <span className="btn-sublabel">3x+</span>
+                </button>
+              </div>
+            </>
+          )}
+        </>
+      )}
+
+      {/* ── TAB: PARSER ── */}
+      {activeTab === 'parse' && (
+        <div className="parser-panel">
+          <p className="section-title" style={{ padding: '0 0 8px' }}>PASTE HAND HISTORY (N8 / POKERCRAFT)</p>
+          <textarea
+            className="hand-input"
+            value={rawInput}
+            onChange={e => setRawInput(e.target.value)}
+            placeholder={`Hand #12345\nDealt to Hero [Ah Kd]\n*** FLOP *** [As 7d 2c]\nPot: 200\nVillain bets 300\nEffective stack: 800`}
+          />
+
+          {parseError && (
+            <div style={{ marginTop: 8, padding: '8px 12px', background: 'rgba(231,76,60,0.1)', border: '1px solid rgba(231,76,60,0.3)', borderRadius: 6, fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: '#e74c3c' }}>
+              ⚠ {parseError}
+            </div>
+          )}
+
+          <button className="parse-btn" onClick={handleParse}>PARSE & ANALYZE HAND</button>
+
+          {/* Parsed result preview */}
+          {parsedHand && (
+            <>
+              <p className="section-title" style={{ padding: '16px 0 6px' }}>EXTRACTED DATA</p>
+              <div className="parsed-grid">
+                <div className="stat-box">
+                  <div className="stat-label">HERO CARDS</div>
+                  <div className="stat-value small">
+                    {parsedHand.heroCards.length > 0
+                      ? parsedHand.heroCards.map(c => `${c.rank}${SUIT_SYMBOLS[c.suit]}`).join(' ')
+                      : 'NOT FOUND'}
+                  </div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-label">BOARD</div>
+                  <div className="stat-value small">
+                    {parsedHand.boardCards.length > 0
+                      ? parsedHand.boardCards.map(c => `${c.rank}${SUIT_SYMBOLS[c.suit]}`).join(' ')
+                      : '—'}
+                  </div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-label">POT SIZE</div>
+                  <div className="stat-value">{parsedHand.potSize || '—'}</div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-label">VILLAIN BET</div>
+                  <div className="stat-value" style={{ color: '#e74c3c' }}>{parsedHand.villainBet || '—'}</div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-label">EFF. STACK</div>
+                  <div className="stat-value small">{parsedHand.effectiveStack || '—'}</div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-label">STREET</div>
+                  <div className="stat-value small">{parsedHand.street.toUpperCase()}</div>
+                </div>
+              </div>
+
+              <button className="parse-btn" style={{ marginTop: 12, background: 'linear-gradient(135deg, #1a2a3a, #0f1e2e)', borderColor: 'rgba(46,204,113,0.4)', color: '#2ecc71' }}
+                onClick={() => setActiveTab('train')}>
+                GO TO TRAINER ▶
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ── TAB: SCENARIO LIBRARY ── */}
+      {activeTab === 'library' && (
+        <>
+          <p className="section-title">PRESET TRAINING SCENARIOS</p>
+          {PRESET_SCENARIOS.map(s => (
+            <div key={s.id} className="scenario-card" onClick={() => loadScenario(s)}>
+              <div>
+                <div className="scenario-name">{s.name}</div>
+                <div className="scenario-desc">{s.description}</div>
+              </div>
+              <div style={{ marginLeft: 12, flexShrink: 0 }}>
+                <span className={`scenario-tag tag-${s.difficulty}`}>{s.difficulty.toUpperCase()}</span>
+              </div>
+            </div>
+          ))}
+          <div style={{ padding: '16px 20px 0' }}>
+            <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 9, color: 'var(--text-dim)', letterSpacing: '1px', textAlign: 'center' }}>
+              // MORE SCENARIOS: Add to PRESET_SCENARIOS array in source code<br/>
+              // Include: 3-bet pots · multi-way · wet boards · tournament ICM spots
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Feedback Modal */}
+      {feedbackResult && (
+        <FeedbackModal
+          result={feedbackResult}
+          userAction={userAction}
+          onClose={handleCloseModal}
+        />
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
 </body>
 </html>
