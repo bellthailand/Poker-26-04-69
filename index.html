@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>GTO Poker Trainer</title>
+  <title>โปรแกรมฝึก GTO โป๊กเกอร์</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --felt: #0d1f12;
@@ -17,8 +17,6 @@
       --gold: #c9a84c;
       --gold-bright: #f0c94a;
       --gold-dim: #7a6020;
-      --chip-red: #c0392b;
-      --chip-blue: #2471a3;
       --text-main: #e8dfc0;
       --text-dim: #8a7d5a;
       --accent-green: #2ecc71;
@@ -32,12 +30,11 @@
     body {
       background-color: var(--felt-edge);
       color: var(--text-main);
-      font-family: 'Rajdhani', sans-serif;
+      font-family: 'Sarabun', sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
     }
 
-    /* Felt texture */
     body::before {
       content: '';
       position: fixed;
@@ -58,7 +55,6 @@
       padding: 0 0 32px;
     }
 
-    /* ── Header ── */
     .header {
       background: linear-gradient(180deg, #0a1a0e 0%, var(--felt) 100%);
       border-bottom: 2px solid var(--gold-dim);
@@ -82,6 +78,15 @@
 
     .logo span { color: var(--gold-bright); }
 
+    .logo-th {
+      font-family: 'Sarabun', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
     .badge {
       font-family: 'Share Tech Mono', monospace;
       font-size: 10px;
@@ -93,37 +98,35 @@
       letter-spacing: 1px;
     }
 
-    /* ── Section Titles ── */
     .section-title {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
       color: var(--gold-dim);
-      letter-spacing: 3px;
-      text-transform: uppercase;
+      letter-spacing: 1px;
       padding: 16px 20px 8px;
     }
 
-    /* ── Tab Bar ── */
     .tab-bar {
       display: flex;
       background: var(--felt);
       border-bottom: 1px solid rgba(201,168,76,0.2);
-      padding: 0 20px;
-      gap: 4px;
+      padding: 0 8px;
+      gap: 2px;
     }
 
     .tab-btn {
-      font-family: 'Rajdhani', sans-serif;
-      font-weight: 600;
+      font-family: 'Sarabun', sans-serif;
+      font-weight: 700;
       font-size: 13px;
-      letter-spacing: 1px;
-      padding: 10px 16px;
+      padding: 10px 14px;
       color: var(--text-dim);
       background: none;
       border: none;
       border-bottom: 2px solid transparent;
       cursor: pointer;
       transition: all 0.2s;
+      white-space: nowrap;
     }
 
     .tab-btn.active {
@@ -131,10 +134,7 @@
       border-bottom-color: var(--gold);
     }
 
-    /* ── Parser Panel ── */
-    .parser-panel {
-      padding: 16px 20px;
-    }
+    .parser-panel { padding: 16px 20px; }
 
     .hand-input {
       width: 100%;
@@ -158,15 +158,15 @@
     .parse-btn {
       width: 100%;
       margin-top: 10px;
-      padding: 12px;
+      padding: 13px;
       background: linear-gradient(135deg, #1a3a1f, #0f2614);
       border: 1px solid var(--gold-dim);
       border-radius: 6px;
       color: var(--gold);
-      font-family: 'Orbitron', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 2px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1px;
       cursor: pointer;
       transition: all 0.2s;
     }
@@ -179,7 +179,6 @@
 
     .parse-btn:active { transform: scale(0.98); }
 
-    /* ── Parsed Info ── */
     .parsed-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -195,11 +194,10 @@
     }
 
     .stat-label {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
       color: var(--text-dim);
-      letter-spacing: 2px;
-      text-transform: uppercase;
       margin-bottom: 4px;
     }
 
@@ -212,7 +210,7 @@
 
     .stat-value.small { font-size: 12px; }
 
-    /* ── Felt Table ── */
+    /* Felt Table */
     .felt-table {
       margin: 0 20px;
       background: radial-gradient(ellipse at center, #1a3d20 0%, #0d2211 60%, #081508 100%);
@@ -235,7 +233,6 @@
       pointer-events: none;
     }
 
-    /* ── Playing Cards ── */
     .cards-row {
       display: flex;
       justify-content: center;
@@ -257,24 +254,20 @@
       position: relative;
       font-weight: 700;
       transition: transform 0.3s;
+      animation: dealCard 0.3s ease backwards;
+    }
+
+    @keyframes dealCard {
+      from { transform: translateY(-20px) rotate(-5deg); opacity: 0; }
+      to { transform: translateY(0) rotate(0); opacity: 1; }
     }
 
     .card.hero-card { border-color: var(--gold); box-shadow: 2px 3px 8px rgba(0,0,0,0.7), 0 0 12px rgba(201,168,76,0.5); }
     .card.face-down { background: linear-gradient(135deg, #1a3a6e, #0d2147); border-color: #2a4a8e; }
     .card.placeholder { background: rgba(0,0,0,0.2); border: 1px dashed rgba(201,168,76,0.2); }
 
-    .card-rank {
-      font-family: 'Georgia', serif;
-      font-size: 18px;
-      line-height: 1;
-    }
-
-    .card-suit {
-      font-size: 14px;
-      line-height: 1;
-      margin-top: 1px;
-    }
-
+    .card-rank { font-family: 'Georgia', serif; font-size: 18px; line-height: 1; }
+    .card-suit { font-size: 14px; line-height: 1; margin-top: 1px; }
     .card.red .card-rank, .card.red .card-suit { color: #c0392b; }
     .card.black .card-rank, .card.black .card-suit { color: #1a1a1a; }
 
@@ -289,15 +282,8 @@
 
     .card.red .card-corner { color: #c0392b; }
     .card.black .card-corner { color: #1a1a1a; }
+    .card-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(201,168,76,0.3); }
 
-    .card-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: rgba(201,168,76,0.3);
-    }
-
-    /* Villain cards (back) */
     .card-back-pattern {
       width: 30px;
       height: 42px;
@@ -306,21 +292,17 @@
       background: repeating-linear-gradient(45deg, #1a3a6e, #1a3a6e 3px, #0d2147 3px, #0d2147 6px);
     }
 
-    /* ── Street Labels ── */
     .street-label {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
       color: rgba(201,168,76,0.5);
-      letter-spacing: 2px;
       text-align: center;
       margin-bottom: 6px;
+      letter-spacing: 0.5px;
     }
 
-    /* ── Pot Display ── */
-    .pot-display {
-      text-align: center;
-      margin: 12px 0;
-    }
+    .pot-display { text-align: center; margin: 12px 0; }
 
     .pot-chip {
       display: inline-flex;
@@ -341,13 +323,12 @@
     }
 
     .pot-amount {
-      font-family: 'Orbitron', monospace;
-      font-size: 13px;
-      font-weight: 700;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
       color: var(--gold-bright);
     }
 
-    /* ── Villain Action ── */
     .villain-action-bar {
       background: rgba(192,57,43,0.15);
       border: 1px solid rgba(192,57,43,0.35);
@@ -360,10 +341,10 @@
     }
 
     .villain-tag {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
       color: #e67e73;
-      letter-spacing: 1px;
     }
 
     .villain-bet {
@@ -373,7 +354,6 @@
       color: #e74c3c;
     }
 
-    /* ── Math Panel ── */
     .math-panel {
       margin: 12px 20px 0;
       background: rgba(0,0,0,0.3);
@@ -386,17 +366,17 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 4px 0;
+      padding: 5px 0;
       border-bottom: 1px solid rgba(255,255,255,0.04);
     }
 
     .math-row:last-child { border-bottom: none; }
 
     .math-key {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
       color: var(--text-dim);
-      letter-spacing: 1px;
     }
 
     .math-val {
@@ -406,10 +386,6 @@
       color: var(--gold-bright);
     }
 
-    .math-val.green { color: var(--accent-green); }
-    .math-val.red { color: var(--accent-red); }
-
-    /* ── Action Buttons ── */
     .action-row {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -421,30 +397,19 @@
       padding: 14px 8px;
       border-radius: 8px;
       border: none;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
       cursor: pointer;
       transition: all 0.18s;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       position: relative;
       overflow: hidden;
     }
 
-    .action-btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(255,255,255,0.05);
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .action-btn:hover::before { opacity: 1; }
     .action-btn:active { transform: scale(0.96); }
 
     .btn-fold {
@@ -469,14 +434,15 @@
     }
 
     .btn-icon { font-size: 18px; }
+
     .btn-sublabel {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 8px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 9px;
+      font-weight: 600;
       opacity: 0.6;
-      letter-spacing: 0;
     }
 
-    /* ── Feedback Modal ── */
+    /* Modal */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -499,9 +465,14 @@
       max-width: 480px;
       padding: 20px;
       animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
-    @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
 
     .modal-header {
       display: flex;
@@ -511,13 +482,13 @@
     }
 
     .verdict-icon {
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 20px;
       flex-shrink: 0;
     }
 
@@ -526,9 +497,9 @@
     .verdict-icon.neutral { background: rgba(241,196,15,0.2); border: 1px solid rgba(241,196,15,0.5); }
 
     .verdict-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 17px;
+      font-weight: 800;
     }
 
     .verdict-title.correct { color: var(--accent-green); }
@@ -536,11 +507,10 @@
     .verdict-title.neutral { color: #f1c40f; }
 
     .verdict-subtitle {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 11px;
       color: var(--text-dim);
-      margin-top: 2px;
-      letter-spacing: 1px;
+      margin-top: 3px;
     }
 
     .feedback-box {
@@ -548,36 +518,38 @@
       border: 1px solid rgba(201,168,76,0.15);
       border-radius: 8px;
       padding: 12px 14px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .feedback-text {
-      font-size: 13px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
       color: var(--text-main);
-      line-height: 1.6;
+      line-height: 1.7;
     }
 
     .ev-row {
       display: flex;
       justify-content: space-around;
       margin: 10px 0;
+      gap: 6px;
     }
 
     .ev-card {
       text-align: center;
-      padding: 8px 14px;
+      padding: 8px 6px;
       background: rgba(0,0,0,0.3);
       border-radius: 6px;
       border: 1px solid rgba(255,255,255,0.06);
       flex: 1;
-      margin: 0 4px;
     }
 
     .ev-card-label {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
       color: var(--text-dim);
-      letter-spacing: 1px;
     }
 
     .ev-card-value {
@@ -589,23 +561,22 @@
 
     .modal-close-btn {
       width: 100%;
-      padding: 13px;
+      padding: 14px;
       background: linear-gradient(135deg, #1a3a1f, #0f2614);
       border: 1px solid var(--gold-dim);
       border-radius: 8px;
       color: var(--gold);
-      font-family: 'Orbitron', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
       cursor: pointer;
       margin-top: 8px;
       transition: all 0.2s;
     }
 
-    .modal-close-btn:hover { border-color: var(--gold); box-shadow: 0 0 15px rgba(201,168,76,0.2); }
+    .modal-close-btn:hover { border-color: var(--gold); }
 
-    /* ── Scenario Library ── */
+    /* Scenario Library */
     .scenario-card {
       margin: 8px 20px;
       background: rgba(0,0,0,0.3);
@@ -625,11 +596,11 @@
     }
 
     .scenario-tag {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
       padding: 2px 8px;
-      border-radius: 2px;
-      letter-spacing: 1px;
+      border-radius: 4px;
     }
 
     .tag-easy { background: rgba(46,204,113,0.2); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
@@ -637,20 +608,20 @@
     .tag-hard { background: rgba(231,76,60,0.2); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); }
 
     .scenario-name {
-      font-weight: 600;
-      font-size: 13px;
+      font-family: 'Sarabun', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
       color: var(--text-main);
     }
 
     .scenario-desc {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
       color: var(--text-dim);
       margin-top: 3px;
-      letter-spacing: 0.5px;
     }
 
-    /* ── Score Banner ── */
     .score-banner {
       display: flex;
       justify-content: space-around;
@@ -669,30 +640,15 @@
     }
 
     .score-lbl {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 8px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
       color: var(--text-dim);
-      letter-spacing: 1px;
     }
 
-    /* ── Street divider ── */
     .street-section { margin-bottom: 10px; }
 
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
-
-    /* ── Animations ── */
-    .card { animation: dealCard 0.3s ease backwards; }
-    @keyframes dealCard {
-      from { transform: translateY(-20px) rotate(-5deg); opacity: 0; }
-      to { transform: translateY(0) rotate(0); opacity: 1; }
-    }
-
-    .pulse-gold {
-      animation: pulseGold 2s ease-in-out infinite;
-    }
+    .pulse-gold { animation: pulseGold 2s ease-in-out infinite; }
 
     @keyframes pulseGold {
       0%, 100% { box-shadow: 0 0 8px rgba(201,168,76,0.3); }
@@ -700,17 +656,28 @@
     }
 
     .gto-alert {
-      margin: 0 20px;
+      margin: 10px 20px 0;
       padding: 8px 12px;
       background: rgba(241,196,15,0.1);
       border: 1px solid rgba(241,196,15,0.3);
       border-radius: 6px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: #f1c40f;
+    }
+
+    .math-formula {
       font-family: 'Share Tech Mono', monospace;
       font-size: 10px;
-      color: #f1c40f;
-      letter-spacing: 0.5px;
-      margin-top: 10px;
+      color: rgba(201,168,76,0.35);
+      padding: 6px 2px;
+      margin-bottom: 6px;
     }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
   </style>
 </head>
 <body>
@@ -719,15 +686,10 @@
 <script type="text/babel">
 const { useState, useCallback, useMemo } = React;
 
-// ═══════════════════════════════════════════════════════════════
-// ██  SECTION 1: HAND HISTORY PARSER  ██
-// ═══════════════════════════════════════════════════════════════
-//
-// Supports N8/PokerCraft log format.
-// Extend RANK_MAP and SUIT_MAP for new formats.
-// Future: Add PKR, Stars, 888 format adapters here.
-//
-// ───────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+// ██  ส่วนที่ 1: Parser Hand History  ██
+// รองรับ format N8 / PokerCraft
+// ═══════════════════════════════════════════════════════
 
 const RANK_MAP = { 'A':'A','K':'K','Q':'Q','J':'J','T':'T',
   '10':'T','9':'9','8':'8','7':'7','6':'6','5':'5','4':'4','3':'3','2':'2' };
@@ -735,24 +697,17 @@ const RANK_MAP = { 'A':'A','K':'K','Q':'Q','J':'J','T':'T',
 const SUIT_MAP = { 'h':'h','d':'d','c':'c','s':'s',
   'H':'h','D':'d','C':'c','S':'s','♥':'h','♦':'d','♣':'c','♠':'s' };
 
-// Card normalization
-// Input: "Ah", "Kd", "10s", "Ts", "♠A" etc.
-// Returns: { rank, suit } or null
 function parseCard(token) {
   if (!token) return null;
   token = token.trim().replace(/[[\]()]/g, '');
   if (token.length < 2) return null;
-
-  // Handle "♠A" vs "Ah" formats
   let rank, suit;
   if (SUIT_MAP[token[0]]) {
     suit = SUIT_MAP[token[0]];
     rank = RANK_MAP[token.slice(1).toUpperCase()] || null;
   } else {
-    // Try rank-first (most common)
     if (token.length === 3 && token.startsWith('10')) {
-      rank = 'T';
-      suit = SUIT_MAP[token[2]] || null;
+      rank = 'T'; suit = SUIT_MAP[token[2]] || null;
     } else {
       rank = RANK_MAP[token.slice(0, -1).toUpperCase()] || null;
       suit = SUIT_MAP[token[token.length - 1]] || null;
@@ -762,40 +717,21 @@ function parseCard(token) {
   return { rank, suit };
 }
 
-// Main parser function.
-// ┌─────────────────────────────────────────────────────────────┐
-// │  INPUT: Raw hand history string from N8/PokerCraft          │
-// │  OUTPUT: ParsedHand object with all extracted fields        │
-// └─────────────────────────────────────────────────────────────┘
 function parseHandHistory(raw) {
   const result = {
-    heroCards: [],      // [CardObj, CardObj]
-    boardCards: [],     // up to 5 CardObj
-    flop: [],
-    turn: null,
-    river: null,
-    potSize: 0,         // in chips
-    effectiveStack: 0,
-    villainBet: 0,
-    heroPosition: '',
-    street: 'preflop',  // preflop | flop | turn | river
-    handId: '',
-    parseErrors: [],
+    heroCards: [], boardCards: [], flop: [], turn: null, river: null,
+    potSize: 0, effectiveStack: 0, villainBet: 0,
+    heroPosition: '', street: 'preflop', handId: '', parseErrors: [],
   };
 
   if (!raw || raw.trim().length < 10) {
-    result.parseErrors.push('Input too short or empty');
+    result.parseErrors.push('ข้อมูลสั้นเกินไปหรือว่างเปล่า');
     return result;
   }
 
-  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
-
-  // ── Hand ID ──
   const idMatch = raw.match(/Hand\s*#?\s*(\w+)/i);
   if (idMatch) result.handId = idMatch[1];
 
-  // ── Hero Cards (N8 format: "Dealt to Hero [Ah Kd]") ──
-  // Also handles: "Hero: [Ah Kd]", "Hole cards: Ah Kd"
   const heroPatterns = [
     /Dealt to\s+\w+\s*\[([^\]]+)\]/i,
     /Hero[^:]*:\s*\[([^\]]+)\]/i,
@@ -811,57 +747,37 @@ function parseHandHistory(raw) {
     }
   }
 
-  // ── Board Cards ──
-  // Flop: "*** FLOP *** [2h 7c Ks]"
   const flopMatch = raw.match(/FLOP[^[]*\[([^\]]+)\]/i);
   if (flopMatch) {
-    const tokens = flopMatch[1].trim().split(/\s+/);
-    result.flop = tokens.map(parseCard).filter(Boolean);
+    result.flop = flopMatch[1].trim().split(/\s+/).map(parseCard).filter(Boolean);
     result.boardCards = [...result.flop];
     result.street = 'flop';
   }
 
-  // Turn: "*** TURN *** [2h 7c Ks] [Ah]"
   const turnMatch = raw.match(/TURN[^[]*\[[^\]]+\]\s*\[([^\]]+)\]/i);
   if (turnMatch) {
     result.turn = parseCard(turnMatch[1].trim().split(/\s+/)[0]);
     if (result.turn) { result.boardCards.push(result.turn); result.street = 'turn'; }
   }
 
-  // River: "*** RIVER *** [2h 7c Ks Ah] [Td]"
   const riverMatch = raw.match(/RIVER[^[]*\[[^\]]+\]\s*\[([^\]]+)\]/i);
   if (riverMatch) {
     result.river = parseCard(riverMatch[1].trim().split(/\s+/)[0]);
     if (result.river) { result.boardCards.push(result.river); result.street = 'river'; }
   }
 
-  // ── Pot Size ──
-  // Try "Total pot: 450" or "Pot: 450" or "pot of 450"
-  const potPatterns = [
-    /Total pot[:\s]+(\d+(?:\.\d+)?)/i,
-    /Pot[:\s]+(\d+(?:\.\d+)?)/i,
-    /pot of\s+(\d+(?:\.\d+)?)/i,
-    /Main pot\s+(\d+(?:\.\d+)?)/i,
-  ];
+  const potPatterns = [/Total pot[:\s]+(\d+(?:\.\d+)?)/i, /Pot[:\s]+(\d+(?:\.\d+)?)/i, /pot of\s+(\d+)/i];
   for (const pat of potPatterns) {
     const m = raw.match(pat);
     if (m) { result.potSize = parseFloat(m[1]); break; }
   }
 
-  // ── Effective Stack ──
-  const stackPatterns = [
-    /Effective stack[:\s]+(\d+(?:\.\d+)?)/i,
-    /Stack[:\s]+(\d+(?:\.\d+)?)/i,
-    /Hero.*?(\d+(?:\.\d+)?)\s*(?:chips|BB)/i,
-  ];
+  const stackPatterns = [/Effective stack[:\s]+(\d+(?:\.\d+)?)/i, /Stack[:\s]+(\d+(?:\.\d+)?)/i];
   for (const pat of stackPatterns) {
     const m = raw.match(pat);
     if (m) { result.effectiveStack = parseFloat(m[1]); break; }
   }
 
-  // ── Villain Bet ──
-  // "Villain bets 200", "raises to 350", "bets 75"
-  // We grab the LAST bet/raise action before hero acts
   const betPatterns = [
     /(?:Villain|OOP|IP|BTN|BB|SB|UTG|HJ|CO|MP)\s+bets\s+(\d+(?:\.\d+)?)/i,
     /(?:Villain|OOP|IP|BTN|BB|SB|UTG|HJ|CO|MP)\s+raises?\s+to\s+(\d+(?:\.\d+)?)/i,
@@ -871,52 +787,33 @@ function parseHandHistory(raw) {
   for (const pat of betPatterns) {
     const allMatches = [...raw.matchAll(new RegExp(pat.source, 'gi'))];
     if (allMatches.length > 0) {
-      const last = allMatches[allMatches.length - 1];
-      result.villainBet = parseFloat(last[1]);
+      result.villainBet = parseFloat(allMatches[allMatches.length - 1][1]);
       break;
     }
   }
-
-  // ── Position ──
-  const posMatch = raw.match(/Hero[^(]*\(([^)]+)\)/i);
-  if (posMatch) result.heroPosition = posMatch[1].trim();
 
   return result;
 }
 
 
-// ═══════════════════════════════════════════════════════════════
-// ██  SECTION 2: POKER MATH ENGINE  ██
-// ═══════════════════════════════════════════════════════════════
-//
-// All EV calculations live here. This is the layer to extend with:
-// - Equity calculators (Monte Carlo / exact enumeration)
-// - Bayes' Theorem for range updates
-// - MDF (Minimum Defense Frequency) checks
-// - ICM adjustments for tournament play
-//
-// ───────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+// ██  ส่วนที่ 2: คำนวณคณิตศาสตร์โป๊กเกอร์  ██
+// ═══════════════════════════════════════════════════════
 
 function calculatePotOdds(potSize, villainBet) {
-  // Pot Odds = Call Amount / (Pot + Call Amount)
-  // This is the BREAK-EVEN equity needed to call profitably.
   if (villainBet <= 0) return { ratio: '—', percentage: 0, callAmount: 0 };
-  const callAmount = villainBet;
-  const totalPot = potSize + callAmount;
-  const percentage = (callAmount / totalPot) * 100;
-  const ratio = `${Math.round(potSize / callAmount)}:1`;
-  return { ratio, percentage: parseFloat(percentage.toFixed(1)), callAmount };
+  const totalPot = potSize + villainBet;
+  const percentage = (villainBet / totalPot) * 100;
+  const ratio = `${Math.round(potSize / villainBet)}:1`;
+  return { ratio, percentage: parseFloat(percentage.toFixed(1)), callAmount: villainBet };
 }
 
 function calculateMDF(villainBet, potSize) {
-  // Minimum Defense Frequency = Pot / (Pot + Bet)
-  // How often Hero must not-fold to prevent villain from auto-profiting.
   if (villainBet <= 0) return 0;
   return parseFloat(((potSize / (potSize + villainBet)) * 100).toFixed(1));
 }
 
 function calculateBetSizingClass(villainBet, potSize) {
-  // Bet size relative to pot
   if (potSize === 0) return 'unknown';
   const ratio = villainBet / potSize;
   if (ratio >= 1.0) return 'overpot';
@@ -926,122 +823,114 @@ function calculateBetSizingClass(villainBet, potSize) {
   return 'small';
 }
 
-// ┌─────────────────────────────────────────────────────────────┐
-// │  GTO Evaluation Engine                                      │
-// │  Input: parsed hand + user action                           │
-// │  Output: { verdict, correctAction, explanation, ev }        │
-// │                                                             │
-// │  FUTURE EXPANSION:                                          │
-// │  - Replace placeholderHandStrength with actual equity calc  │
-// │  - Insert Bayes range narrowing after each street card      │
-// │  - Add solver-imported GTO strategies per spot              │
-// └─────────────────────────────────────────────────────────────┘
-function evaluateAction(parsedHand, userAction, handStrength, boardTexture) {
-  const { potSize, villainBet, boardCards } = parsedHand;
+// ── Engine ประเมินผลการตัดสินใจตาม GTO ──
+// TODO: แทนที่ equity ด้วย Monte Carlo / exact enumeration
+// TODO: เพิ่ม Bayes range update หลังแต่ละ street
+function evaluateAction(parsedHand, userAction, handStrength) {
+  const { potSize, villainBet } = parsedHand;
   const potOdds = calculatePotOdds(potSize, villainBet);
   const mdf = calculateMDF(villainBet, potSize);
   const betClass = calculateBetSizingClass(villainBet, potSize);
 
-  // ── Placeholder hand strength mapping ──
-  // In production: replace with equity vs villain range using Monte Carlo.
   const STRENGTH_EQUITY = {
-    'top_pair_top_kicker': 72,
-    'top_pair': 62,
-    'second_pair': 40,
-    'third_pair': 28,
-    'overpair': 78,
-    'two_pair': 82,
-    'set': 90,
-    'flush_draw': 35,
-    'straight_draw': 30,
-    'air': 12,
-    'bluff_catcher': 38,
+    'top_pair_top_kicker': 72, 'top_pair': 62, 'second_pair': 40,
+    'third_pair': 28, 'overpair': 78, 'two_pair': 82, 'set': 90,
+    'flush_draw': 35, 'straight_draw': 30, 'air': 12, 'bluff_catcher': 38,
   };
 
   const equity = STRENGTH_EQUITY[handStrength] || 40;
-
-  // ── Core GTO Decision Logic ──
-  // Principle: Call if Equity > Pot Odds %, Fold otherwise (pure EV)
-  // Raise if we have significant equity advantage over villain's range.
-  //
-  // TODO (Bayes): After each action, update villain's perceived range.
-  // e.g. villain overpot on Ace-high board → range is polarized →
-  //      bluff catcher EV = (mdf/100 * pot) - ((1-mdf/100) * call)
-
-  let correctAction, reasoning, verdict;
   const needsEquity = potOdds.percentage;
-  const hasEquity = equity;
+  const betPct = potSize > 0 ? Math.round((villainBet / potSize) * 100) : 0;
 
-  // Special rule: Overpot polarizes villain's range → higher fold threshold
+  let correctAction, reasoning;
+
   if (betClass === 'overpot') {
-    // Villain is either very strong or bluffing. Pure EV math:
-    // EV(call) = equity * (pot + bet) - (1 - equity) * bet
-    const evCall = (hasEquity / 100) * (potSize + villainBet) - ((1 - hasEquity / 100) * villainBet);
-    const evFold = 0;
-
-    if (hasEquity < 35) {
+    const evCall = (equity / 100) * (potSize + villainBet) - ((1 - equity / 100) * villainBet);
+    if (equity < 35) {
       correctAction = 'FOLD';
-      reasoning = `Villain's overpot bet (${Math.round((villainBet/potSize)*100)}% of pot) polarizes their range to very strong hands or bluffs. With ${handStrength.replace(/_/g,' ')} (est. equity ~${hasEquity}%), you only need ${needsEquity}% equity to call. You're below that threshold. EV(call) ≈ ${evCall.toFixed(0)} chips — fold is correct.`;
-    } else if (hasEquity >= 70) {
+      reasoning = `Villain เดิมพัน Overpot (${betPct}% ของ pot) → range ถูก polarize เป็น "ไม้แข็งมาก" หรือ "บลัฟ" เท่านั้น
+      
+คุณต้องการ equity อย่างน้อย ${needsEquity}% เพื่อ call คุ้ม แต่มือของคุณ (${getHandLabel(handStrength)}) มี equity ประมาณ ${equity}% เท่านั้น
+
+EV(call) ≈ ${evCall.toFixed(0)} chips → ติดลบ → พับถูกต้อง`;
+    } else if (equity >= 70) {
       correctAction = 'RAISE';
-      reasoning = `With ${handStrength.replace(/_/g,' ')} (est. ~${hasEquity}% equity) vs an overpot, raising is the highest-EV line. You're ahead of villain's bluff range and charging their draws. EV(raise) > EV(call).`;
+      reasoning = `มือของคุณ (${getHandLabel(handStrength)}) แข็งมาก ~${equity}% equity vs range ที่ Villain Overpot
+
+การ Raise สร้าง EV สูงสุด เพราะคุณบีบ bluff range ของ Villain และชาร์จ draw ในราคาแพง`;
     } else {
       correctAction = 'CALL';
-      reasoning = `Pot odds require ${needsEquity}% equity. Your estimated equity is ~${hasEquity}%, putting you slightly above the breakeven threshold. Calling is defensible; raising is occasionally correct if you're at the top of your range. MDF = ${mdf}% — you must defend at least this often.`;
+      reasoning = `Pot odds ต้องการ ${needsEquity}% equity คุณมี ~${equity}% → อยู่เหนือจุด breakeven เล็กน้อย
+
+Call ได้กำไรระยะยาว MDF = ${mdf}% → คุณต้อง defend อย่างน้อยนี้เพื่อไม่ให้ Villain โกง auto-profit`;
     }
   } else if (betClass === 'large' || betClass === 'half') {
-    if (hasEquity < needsEquity) {
+    if (equity < needsEquity) {
       correctAction = 'FOLD';
-      reasoning = `Required pot odds equity: ${needsEquity}%. Your estimated equity with ${handStrength.replace(/_/g,' ')}: ~${hasEquity}%. EV(call) is negative. Folding preserves EV.`;
-    } else if (hasEquity >= 70) {
+      reasoning = `Pot odds ต้องการ ${needsEquity}% equity แต่ ${getHandLabel(handStrength)} ของคุณมีแค่ ~${equity}%
+
+EV(call) = (${equity}% × ${potSize + villainBet}) − (${100-equity}% × ${villainBet}) → ติดลบ → พับรักษา EV`;
+    } else if (equity >= 70) {
       correctAction = 'RAISE';
-      reasoning = `Your ${handStrength.replace(/_/g,' ')} (~${hasEquity}% equity) is strong enough to raise for value. Calling is also fine, but raising with your best hands builds pot when ahead and denies equity to draws.`;
+      reasoning = `${getHandLabel(handStrength)} (~${equity}% equity) แข็งพอที่จะ Raise เพื่อ value
+
+การ call ก็ถูก แต่ raise ด้วยมือที่ดีที่สุดของคุณช่วย build pot ตอนที่นำอยู่`;
     } else {
       correctAction = 'CALL';
-      reasoning = `Your equity (~${hasEquity}%) exceeds pot odds (${needsEquity}%). EV(call) > 0. You're in a mandatory call spot. MDF = ${mdf}% — defend to prevent villain from over-exploiting.`;
+      reasoning = `Equity ของคุณ (~${equity}%) เกินจุด breakeven ที่ pot odds กำหนด (${needsEquity}%)
+
+EV(call) > 0 → call คุ้ม MDF = ${mdf}% → ต้อง defend ความถี่นี้เพื่อป้องกัน Villain exploit`;
     }
   } else {
-    // Small bets — wide defense range
-    if (hasEquity < 25) {
+    if (equity < 25) {
       correctAction = 'FOLD';
-      reasoning = `Even with a small bet (${Math.round((villainBet/potSize)*100)}% pot), your hand (${handStrength.replace(/_/g,' ')}, ~${hasEquity}% equity) is below the ${needsEquity}% required. Fold and wait for better spots.`;
+      reasoning = `แม้ Villain เดิมพันเล็ก (${betPct}% pot) แต่ ${getHandLabel(handStrength)} (~${equity}% equity) ยังต่ำกว่า breakeven ที่ ${needsEquity}%
+
+พับรอ spot ที่ดีกว่า`;
     } else {
       correctAction = 'CALL';
-      reasoning = `Small bet size means wide MDF (${mdf}%). You must defend very frequently. ${handStrength.replace(/_/g,' ')} (~${hasEquity}% equity) clears the ${needsEquity}% pot odds bar easily. Calling (or raising as a semi-bluff) is correct.`;
+      reasoning = `Bet เล็กมาก → MDF กว้างถึง ${mdf}% คุณต้อง defend บ่อยมาก
+
+${getHandLabel(handStrength)} (~${equity}% equity) ผ่าน bar ที่ ${needsEquity}% อย่างสบาย → call (หรือ semi-bluff raise) ถูก`;
     }
   }
 
-  verdict = userAction === correctAction ? 'correct' : 'incorrect';
-
-  // ── EV of each action ──
-  // Simplified EV model — replace with solver ranges for precision.
-  const evCall = parseFloat(((equity / 100) * (potSize + villainBet) - ((1 - equity / 100) * villainBet)).toFixed(0));
+  const verdict = userAction === correctAction ? 'correct' : 'incorrect';
+  const evCall = parseFloat(((equity/100)*(potSize+villainBet) - ((1-equity/100)*villainBet)).toFixed(0));
   const evFold = 0;
   const evRaise = parseFloat((correctAction === 'RAISE' ? evCall * 1.15 : evCall * 0.85).toFixed(0));
 
-  return {
-    verdict,
-    correctAction,
-    reasoning,
-    potOdds,
-    mdf,
-    betClass,
-    equity,
-    ev: { fold: evFold, call: evCall, raise: evRaise },
+  return { verdict, correctAction, reasoning, potOdds, mdf, betClass, equity, ev: { fold: evFold, call: evCall, raise: evRaise } };
+}
+
+function getHandLabel(key) {
+  const map = {
+    'top_pair_top_kicker': 'Top Pair Top Kicker',
+    'top_pair': 'Top Pair',
+    'second_pair': 'Second Pair',
+    'third_pair': 'Third Pair',
+    'overpair': 'Overpair',
+    'two_pair': 'Two Pair',
+    'set': 'Set / Trips',
+    'flush_draw': 'Flush Draw',
+    'straight_draw': 'Straight Draw',
+    'bluff_catcher': 'Bluff Catcher',
+    'air': 'Air / ไม่มีมือ',
   };
+  return map[key] || key;
 }
 
 
-// ═══════════════════════════════════════════════════════════════
-// ██  SECTION 3: CARD RENDERING COMPONENT  ██
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// ██  ส่วนที่ 3: Component ไพ่  ██
+// ═══════════════════════════════════════════════════════
 
 const SUIT_SYMBOLS = { h: '♥', d: '♦', c: '♣', s: '♠' };
 const SUIT_COLORS = { h: 'red', d: 'red', c: 'black', s: 'black' };
 
 function PlayingCard({ card, delay = 0, isHero = false }) {
   if (!card) {
-    return <div className="card placeholder" style={{ animationDelay: `${delay}s` }}>
+    return <div className="card placeholder" style={{ animationDelay: `${delay * 0.1}s` }}>
       <div className="card-dot" />
     </div>;
   }
@@ -1065,52 +954,52 @@ function VillainCardBack() {
 }
 
 
-// ═══════════════════════════════════════════════════════════════
-// ██  SECTION 4: FEEDBACK MODAL  ██
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// ██  ส่วนที่ 4: Modal แสดงผลการประเมิน  ██
+// ═══════════════════════════════════════════════════════
+
+const ACTION_LABELS = { FOLD: 'พับ (FOLD)', CALL: 'ตาม (CALL)', RAISE: 'ขึ้น (RAISE)' };
+const BET_CLASS_TH = {
+  overpot: 'Over-pot (>100%)', large: 'Bet ใหญ่ (75%+)',
+  half: 'Half-pot (50%)', third: 'Third-pot (33%)',
+  small: 'Bet เล็ก (<33%)', unknown: 'ไม่ทราบ'
+};
 
 function FeedbackModal({ result, userAction, onClose }) {
   if (!result) return null;
   const { verdict, correctAction, reasoning, potOdds, mdf, ev, equity, betClass } = result;
 
-  const verdictConfig = {
-    correct: { icon: '✓', label: 'CORRECT PLAY', color: 'correct' },
-    incorrect: { icon: '✗', label: 'SUBOPTIMAL LINE', color: 'incorrect' },
-    neutral: { icon: '≈', label: 'MARGINAL SPOT', color: 'neutral' },
-  };
-  const cfg = verdictConfig[verdict] || verdictConfig.neutral;
-
-  const betClassLabel = {
-    overpot: 'OVER-POT', large: 'LARGE (75%+)', half: 'HALF-POT',
-    third: 'THIRD-POT', small: 'SMALL (<33%)', unknown: 'UNKNOWN'
-  };
+  const cfg = {
+    correct: { icon: '✓', label: 'ถูกต้อง! การเล่นที่ดีที่สุด', color: 'correct' },
+    incorrect: { icon: '✗', label: 'ยังไม่ดีที่สุด — มีทางที่ดีกว่า', color: 'incorrect' },
+  }[verdict] || { icon: '≈', label: 'พอใช้ได้', color: 'neutral' };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-sheet" onClick={e => e.stopPropagation()}>
 
-        {/* Header */}
         <div className="modal-header">
           <div className={`verdict-icon ${cfg.color}`}>{cfg.icon}</div>
           <div>
             <div className={`verdict-title ${cfg.color}`}>{cfg.label}</div>
             <div className="verdict-subtitle">
-              YOUR ACTION: {userAction} · OPTIMAL: {correctAction}
+              คุณเลือก: {ACTION_LABELS[userAction]} · ที่ถูกต้อง: {ACTION_LABELS[correctAction]}
             </div>
           </div>
         </div>
 
-        {/* EV Comparison */}
+        {/* EV ของแต่ละ action */}
         <div className="ev-row">
           {[
-            { label: 'EV FOLD', value: ev.fold, action: 'FOLD' },
-            { label: 'EV CALL', value: ev.call, action: 'CALL' },
-            { label: 'EV RAISE', value: ev.raise, action: 'RAISE' },
+            { label: 'EV พับ', value: ev.fold, action: 'FOLD' },
+            { label: 'EV ตาม', value: ev.call, action: 'CALL' },
+            { label: 'EV ขึ้น', value: ev.raise, action: 'RAISE' },
           ].map(({ label, value, action }) => {
             const isBest = action === correctAction;
             const color = value > 0 ? '#2ecc71' : value < 0 ? '#e74c3c' : '#f1c40f';
             return (
-              <div key={label} className="ev-card" style={isBest ? { borderColor: 'rgba(201,168,76,0.4)', background: 'rgba(201,168,76,0.06)' } : {}}>
+              <div key={label} className="ev-card"
+                style={isBest ? { borderColor:'rgba(201,168,76,0.5)', background:'rgba(201,168,76,0.08)' } : {}}>
                 <div className="ev-card-label">{label}</div>
                 <div className="ev-card-value" style={{ color }}>
                   {value > 0 ? '+' : ''}{value}
@@ -1120,154 +1009,112 @@ function FeedbackModal({ result, userAction, onClose }) {
           })}
         </div>
 
-        {/* Math breakdown */}
-        <div className="feedback-box" style={{ marginTop: 10 }}>
-          <div className="math-row">
-            <span className="math-key">POT ODDS REQUIRED</span>
-            <span className="math-val">{potOdds.percentage}%</span>
+        {/* ตัวเลขคณิตศาสตร์ */}
+        <div className="feedback-box">
+          <div className="math-row" style={{ display:'flex', justifyContent:'space-between', padding:'4px 0', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+            <span style={{ fontFamily:"'Sarabun'", fontSize:11, fontWeight:600, color:'var(--text-dim)' }}>Pot Odds ที่ต้องการ</span>
+            <span style={{ fontFamily:"'Orbitron', monospace", fontSize:12, fontWeight:700, color:'var(--gold-bright)' }}>{potOdds.percentage}%</span>
           </div>
-          <div className="math-row">
-            <span className="math-key">EST. EQUITY vs RANGE</span>
-            <span className="math-val" style={{ color: equity >= potOdds.percentage ? '#2ecc71' : '#e74c3c' }}>{equity}%</span>
+          <div className="math-row" style={{ display:'flex', justifyContent:'space-between', padding:'4px 0', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+            <span style={{ fontFamily:"'Sarabun'", fontSize:11, fontWeight:600, color:'var(--text-dim)' }}>Equity ของคุณ (ประมาณ)</span>
+            <span style={{ fontFamily:"'Orbitron', monospace", fontSize:12, fontWeight:700, color: equity >= potOdds.percentage ? '#2ecc71' : '#e74c3c' }}>{equity}%</span>
           </div>
-          <div className="math-row">
-            <span className="math-key">MIN DEFENSE FREQ</span>
-            <span className="math-val">{mdf}%</span>
+          <div className="math-row" style={{ display:'flex', justifyContent:'space-between', padding:'4px 0', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+            <span style={{ fontFamily:"'Sarabun'", fontSize:11, fontWeight:600, color:'var(--text-dim)' }}>Min Defense Freq (MDF)</span>
+            <span style={{ fontFamily:"'Orbitron', monospace", fontSize:12, fontWeight:700, color:'var(--gold-bright)' }}>{mdf}%</span>
           </div>
-          <div className="math-row">
-            <span className="math-key">BET SIZE CLASS</span>
-            <span className="math-val small">{betClassLabel[betClass]}</span>
+          <div className="math-row" style={{ display:'flex', justifyContent:'space-between', padding:'4px 0' }}>
+            <span style={{ fontFamily:"'Sarabun'", fontSize:11, fontWeight:600, color:'var(--text-dim)' }}>ขนาด Bet ของ Villain</span>
+            <span style={{ fontFamily:"'Sarabun'", fontSize:11, fontWeight:700, color:'var(--gold-bright)' }}>{BET_CLASS_TH[betClass]}</span>
           </div>
         </div>
 
-        {/* Reasoning */}
+        {/* คำอธิบาย */}
         <div className="feedback-box">
           <p className="feedback-text">{reasoning}</p>
         </div>
 
-        {/* Bayes placeholder note */}
-        <div style={{ padding: '6px 2px', marginBottom: 8 }}>
-          <p style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 9, color: 'rgba(201,168,76,0.4)', letterSpacing: '0.5px' }}>
-            // TODO: Insert Bayes range update here → villain bet class "{betClass}" narrows range probability distribution.
-          </p>
+        <div className="math-formula">
+          // Pot Odds = Call ÷ (Pot + Call) | MDF = Pot ÷ (Pot + Bet)
         </div>
 
-        <button className="modal-close-btn" onClick={onClose}>CONTINUE TRAINING</button>
+        <button className="modal-close-btn" onClick={onClose}>✦ ฝึกต่อ</button>
       </div>
     </div>
   );
 }
 
 
-// ═══════════════════════════════════════════════════════════════
-// ██  SECTION 5: PRESET SCENARIO LIBRARY  ██
-// ═══════════════════════════════════════════════════════════════
-//
-// Preset training scenarios for offline drilling.
-// Format compatible with the parser output schema.
-// Add more spots: 3-bet pots, multi-way, wet boards, etc.
-//
-// ───────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+// ██  ส่วนที่ 5: Scenario Library (ภาษาไทย)  ██
+// ═══════════════════════════════════════════════════════
 
 const PRESET_SCENARIOS = [
   {
     id: 1,
-    name: 'Overpot on Ace-High Board',
+    name: 'Overpot บนบอร์ด Ace-high',
     difficulty: 'easy',
-    description: 'Villain bets 300 into 200 on A♠7♦2♣',
+    description: 'Villain bet 300 ใน pot 200 บน A♠7♦2♣',
     handStrength: 'second_pair',
-    boardTexture: 'dry',
-    raw: `Hand #001
-Dealt to Hero [7h 6d]
-*** FLOP *** [As 7d 2c]
-Pot: 200
-Villain bets 300
-Effective stack: 800`,
+    raw: `Hand #001\nDealt to Hero [7h 6d]\n*** FLOP *** [As 7d 2c]\nPot: 200\nVillain bets 300\nEffective stack: 800`,
   },
   {
     id: 2,
-    name: 'Half-Pot with Top Pair',
+    name: 'Top Pair vs Half-pot C-bet',
     difficulty: 'easy',
-    description: 'You hit top pair, villain c-bets half-pot',
+    description: 'คุณโดน C-bet ครึ่ง pot หลังตี Top Pair',
     handStrength: 'top_pair_top_kicker',
-    boardTexture: 'dry',
-    raw: `Hand #002
-Dealt to Hero [Ks Qh]
-*** FLOP *** [Kd 8c 3h]
-Pot: 120
-Villain bets 60
-Effective stack: 600`,
+    raw: `Hand #002\nDealt to Hero [Ks Qh]\n*** FLOP *** [Kd 8c 3h]\nPot: 120\nVillain bets 60\nEffective stack: 600`,
   },
   {
     id: 3,
-    name: 'Flush Draw vs Large Bet',
+    name: 'Flush Draw vs Bet ใหญ่',
     difficulty: 'medium',
-    description: 'Nut flush draw facing 75% pot on wet board',
+    description: 'Nut flush draw เจอ bet 75% บน wet board Turn',
     handStrength: 'flush_draw',
-    boardTexture: 'wet',
-    raw: `Hand #003
-Dealt to Hero [Ah 5h]
-*** FLOP *** [Kh 9h 2d]
-*** TURN *** [Kh 9h 2d] [Jc]
-Pot: 400
-Villain bets 300
-Effective stack: 1200`,
+    raw: `Hand #003\nDealt to Hero [Ah 5h]\n*** FLOP *** [Kh 9h 2d]\n*** TURN *** [Kh 9h 2d] [Jc]\nPot: 400\nVillain bets 300\nEffective stack: 1200`,
   },
   {
     id: 4,
     name: 'Set vs River Overbet',
     difficulty: 'hard',
-    description: 'Bottom set on dangerous river, villain overbets',
+    description: 'Bottom set บน River อันตราย Villain Overbet',
     handStrength: 'set',
-    boardTexture: 'dynamic',
-    raw: `Hand #004
-Dealt to Hero [2c 2d]
-*** FLOP *** [2h Ks Qd]
-*** TURN *** [2h Ks Qd] [Jh]
-*** RIVER *** [2h Ks Qd Jh] [Th]
-Pot: 600
-Villain bets 750
-Effective stack: 2000`,
+    raw: `Hand #004\nDealt to Hero [2c 2d]\n*** FLOP *** [2h Ks Qd]\n*** TURN *** [2h Ks Qd] [Jh]\n*** RIVER *** [2h Ks Qd Jh] [Th]\nPot: 600\nVillain bets 750\nEffective stack: 2000`,
   },
   {
     id: 5,
-    name: 'Bluff Catcher on Blank River',
+    name: 'Bluff Catcher บน River ไม้ตาย',
     difficulty: 'hard',
-    description: 'Third pair facing small river bet',
+    description: 'Third pair เจอ bet เล็กบน River — call หรือพับ?',
     handStrength: 'bluff_catcher',
-    boardTexture: 'dry',
-    raw: `Hand #005
-Dealt to Hero [8h 8d]
-*** FLOP *** [Ac Kd 9s]
-*** TURN *** [Ac Kd 9s] [2c]
-*** RIVER *** [Ac Kd 9s 2c] [5h]
-Pot: 500
-Villain bets 100
-Effective stack: 1500`,
+    raw: `Hand #005\nDealt to Hero [8h 8d]\n*** FLOP *** [Ac Kd 9s]\n*** TURN *** [Ac Kd 9s] [2c]\n*** RIVER *** [Ac Kd 9s 2c] [5h]\nPot: 500\nVillain bets 100\nEffective stack: 1500`,
   },
 ];
 
 const HAND_STRENGTHS = [
   { value: 'top_pair_top_kicker', label: 'Top Pair Top Kicker (TPTK)' },
-  { value: 'top_pair', label: 'Top Pair' },
-  { value: 'second_pair', label: 'Second Pair' },
-  { value: 'third_pair', label: 'Third Pair / Low Pair' },
-  { value: 'overpair', label: 'Overpair' },
-  { value: 'two_pair', label: 'Two Pair' },
-  { value: 'set', label: 'Set / Trips' },
-  { value: 'flush_draw', label: 'Flush Draw' },
+  { value: 'top_pair', label: 'Top Pair (TP)' },
+  { value: 'second_pair', label: 'Second Pair (2nd pair)' },
+  { value: 'third_pair', label: 'Third Pair / Pair เล็ก' },
+  { value: 'overpair', label: 'Overpair (เกิน Board)' },
+  { value: 'two_pair', label: 'Two Pair (สองคู่)' },
+  { value: 'set', label: 'Set / Trips (สามตัว)' },
+  { value: 'flush_draw', label: 'Flush Draw (4 ใบสี)' },
   { value: 'straight_draw', label: 'Straight Draw (OESD/GS)' },
-  { value: 'bluff_catcher', label: 'Bluff Catcher' },
-  { value: 'air', label: 'Air / No Made Hand' },
+  { value: 'bluff_catcher', label: 'Bluff Catcher (ไม้รับบลัฟ)' },
+  { value: 'air', label: 'Air / ไม่มีมือเลย' },
 ];
 
+const STREET_TH = { preflop: 'ก่อน FLOP', flop: 'FLOP', turn: 'TURN', river: 'RIVER' };
 
-// ═══════════════════════════════════════════════════════════════
-// ██  SECTION 6: MAIN APP COMPONENT  ██
-// ═══════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════
+// ██  ส่วนที่ 6: App หลัก  ██
+// ═══════════════════════════════════════════════════════
 
 function App() {
-  const [activeTab, setActiveTab] = useState('train');    // train | parse | library
+  const [activeTab, setActiveTab] = useState('train');
   const [rawInput, setRawInput] = useState('');
   const [parsedHand, setParsedHand] = useState(null);
   const [handStrength, setHandStrength] = useState('second_pair');
@@ -1276,36 +1123,28 @@ function App() {
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const [parseError, setParseError] = useState('');
 
-  // ── Parse handler ──
   const handleParse = useCallback(() => {
     setParseError('');
     const hand = parseHandHistory(rawInput);
-    if (hand.parseErrors.length > 0 && hand.heroCards.length === 0) {
-      setParseError('Could not parse hero cards. Check format.');
-    }
+    if (hand.heroCards.length === 0) setParseError('ไม่พบไพ่ Hero — ตรวจสอบ format อีกครั้ง');
     setParsedHand(hand);
     setFeedbackResult(null);
     setUserAction(null);
-    if (hand.potSize > 0 || hand.heroCards.length > 0) {
-      setActiveTab('train');
-    }
+    if (hand.potSize > 0 || hand.heroCards.length > 0) setActiveTab('train');
   }, [rawInput]);
 
-  // ── Load preset scenario ──
   const loadScenario = useCallback((scenario) => {
     setRawInput(scenario.raw);
-    const hand = parseHandHistory(scenario.raw);
-    setParsedHand(hand);
+    setParsedHand(parseHandHistory(scenario.raw));
     setHandStrength(scenario.handStrength);
     setFeedbackResult(null);
     setUserAction(null);
     setActiveTab('train');
   }, []);
 
-  // ── Action handler ──
   const handleAction = useCallback((action) => {
     if (!parsedHand) return;
-    const result = evaluateAction(parsedHand, action, handStrength, 'dry');
+    const result = evaluateAction(parsedHand, action, handStrength);
     setFeedbackResult(result);
     setUserAction(action);
     setScore(prev => ({
@@ -1314,58 +1153,46 @@ function App() {
     }));
   }, [parsedHand, handStrength]);
 
-  const handleCloseModal = useCallback(() => {
-    setFeedbackResult(null);
-    setUserAction(null);
-  }, []);
-
-  // ── Derived math ──
-  const potOdds = useMemo(() => {
-    if (!parsedHand) return null;
-    return calculatePotOdds(parsedHand.potSize, parsedHand.villainBet);
-  }, [parsedHand]);
-
-  const mdf = useMemo(() => {
-    if (!parsedHand) return 0;
-    return calculateMDF(parsedHand.villainBet, parsedHand.potSize);
-  }, [parsedHand]);
-
+  const potOdds = useMemo(() => parsedHand ? calculatePotOdds(parsedHand.potSize, parsedHand.villainBet) : null, [parsedHand]);
+  const mdf = useMemo(() => parsedHand ? calculateMDF(parsedHand.villainBet, parsedHand.potSize) : 0, [parsedHand]);
   const accuracy = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
-  const streetLabel = parsedHand?.street?.toUpperCase() || '—';
 
   return (
     <div className="app-container">
 
       {/* Header */}
       <header className="header">
-        <div className="logo">GTO<span>TRAINER</span></div>
-        <div className="badge">v1.0 MVP</div>
+        <div>
+          <div className="logo">GTO<span>TRAINER</span></div>
+          <div className="logo-th">โปรแกรมฝึกโป๊กเกอร์</div>
+        </div>
+        <div className="badge">v1.0 TH</div>
       </header>
 
-      {/* Score Banner */}
+      {/* Score */}
       <div className="score-banner">
         <div className="score-item">
           <div className="score-num">{score.correct}</div>
-          <div className="score-lbl">CORRECT</div>
+          <div className="score-lbl">ถูก</div>
         </div>
         <div className="score-item">
           <div className="score-num">{score.total}</div>
-          <div className="score-lbl">HANDS</div>
+          <div className="score-lbl">มือทั้งหมด</div>
         </div>
         <div className="score-item">
           <div className="score-num" style={{ color: accuracy >= 70 ? '#2ecc71' : accuracy >= 50 ? '#f1c40f' : '#e74c3c' }}>
             {accuracy}%
           </div>
-          <div className="score-lbl">ACCURACY</div>
+          <div className="score-lbl">ความแม่นยำ</div>
         </div>
       </div>
 
-      {/* Tab Bar */}
+      {/* Tabs */}
       <div className="tab-bar">
         {[
-          { id: 'train', label: '▶ TRAINER' },
-          { id: 'parse', label: '⌨ PARSER' },
-          { id: 'library', label: '☰ LIBRARY' },
+          { id: 'train', label: '▶ ฝึกเล่น' },
+          { id: 'parse', label: '⌨ วิเคราะห์มือ' },
+          { id: 'library', label: '☰ โจทย์สำเร็จ' },
         ].map(t => (
           <button key={t.id} className={`tab-btn ${activeTab === t.id ? 'active' : ''}`}
             onClick={() => setActiveTab(t.id)}>
@@ -1374,67 +1201,60 @@ function App() {
         ))}
       </div>
 
-      {/* ── TAB: TRAINER ── */}
+      {/* ── แท็บ: ฝึกเล่น ── */}
       {activeTab === 'train' && (
         <>
           {!parsedHand ? (
             <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-              <div style={{ fontFamily: "'Orbitron', monospace", fontSize: 12, color: 'var(--gold-dim)', letterSpacing: 2 }}>
-                NO HAND LOADED
+              <div style={{ fontFamily:"'Orbitron', monospace", fontSize:12, color:'var(--gold-dim)', letterSpacing:2 }}>
+                ยังไม่มีมือไพ่
               </div>
-              <p style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 11, color: 'var(--text-dim)', marginTop: 10 }}>
-                Go to PARSER tab to input a hand,<br/>or LIBRARY to load a preset scenario.
+              <p style={{ fontFamily:"'Sarabun'", fontSize:13, color:'var(--text-dim)', marginTop:10, lineHeight:1.7 }}>
+                ไปที่แท็บ <strong style={{color:'var(--gold)'}}>วิเคราะห์มือ</strong> เพื่อวาง hand history<br/>
+                หรือ <strong style={{color:'var(--gold)'}}>โจทย์สำเร็จ</strong> เพื่อโหลดตัวอย่าง
               </p>
             </div>
           ) : (
             <>
-              {/* Street indicator */}
               <p className="section-title">
-                SCENARIO · {streetLabel} · {parsedHand.handId ? `HAND #${parsedHand.handId}` : 'CUSTOM'}
+                สถานการณ์ · {STREET_TH[parsedHand.street]} {parsedHand.handId ? `· มือ #${parsedHand.handId}` : ''}
               </p>
 
-              {/* Board — Felt Table */}
+              {/* โต๊ะไพ่ */}
               <div className="felt-table">
-                {/* Villain */}
-                <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 14 }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div className="street-label">VILLAIN</div>
-                    <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
-                      <VillainCardBack />
-                      <VillainCardBack />
+                <div style={{ display:'flex', justifyContent:'center', gap:8, marginBottom:14 }}>
+                  <div style={{ textAlign:'center' }}>
+                    <div className="street-label">คู่ต่อสู้ (VILLAIN)</div>
+                    <div style={{ display:'flex', gap:6, justifyContent:'center' }}>
+                      <VillainCardBack /><VillainCardBack />
                     </div>
                   </div>
                 </div>
 
-                {/* Board Cards */}
                 <div className="street-section">
-                  <div className="street-label">BOARD</div>
+                  <div className="street-label">บอร์ด (BOARD)</div>
                   <div className="cards-row">
                     {parsedHand.flop.map((c, i) => <PlayingCard key={`f${i}`} card={c} delay={i} />)}
                     {parsedHand.flop.length < 3 && Array(3 - parsedHand.flop.length).fill(null).map((_, i) =>
                       <PlayingCard key={`fp${i}`} card={null} />)}
-                    {/* Turn */}
-                    <div style={{ width: 6 }} />
+                    <div style={{ width:6 }} />
                     <PlayingCard card={parsedHand.turn} delay={3} />
-                    {/* River */}
-                    <div style={{ width: 6 }} />
+                    <div style={{ width:6 }} />
                     <PlayingCard card={parsedHand.river} delay={4} />
                   </div>
                 </div>
 
-                {/* Pot */}
                 <div className="pot-display">
                   <div className="pot-chip pulse-gold">
                     <div className="pot-chip-icon" />
                     <span className="pot-amount">
-                      POT: {parsedHand.potSize > 0 ? parsedHand.potSize.toLocaleString() : '—'}
+                      หม้อ: {parsedHand.potSize > 0 ? parsedHand.potSize.toLocaleString() : '—'}
                     </span>
                   </div>
                 </div>
 
-                {/* Hero Cards */}
                 <div className="street-section">
-                  <div className="street-label">YOUR HAND</div>
+                  <div className="street-label">ไพ่ของคุณ (HERO)</div>
                   <div className="cards-row">
                     {parsedHand.heroCards.length > 0
                       ? parsedHand.heroCards.map((c, i) => <PlayingCard key={`h${i}`} card={c} delay={i} isHero={true} />)
@@ -1444,82 +1264,76 @@ function App() {
                 </div>
               </div>
 
-              {/* Villain Action */}
+              {/* Villain bet bar */}
               {parsedHand.villainBet > 0 && (
                 <div className="villain-action-bar">
                   <div>
-                    <div className="villain-tag">VILLAIN BETS</div>
-                    <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 9, color: 'var(--text-dim)', marginTop: 2 }}>
-                      {potOdds && `${Math.round((parsedHand.villainBet / parsedHand.potSize) * 100)}% of pot`}
+                    <div className="villain-tag">Villain เดิมพัน</div>
+                    <div style={{ fontFamily:"'Sarabun'", fontSize:10, color:'var(--text-dim)', marginTop:2, fontWeight:600 }}>
+                      {potOdds && parsedHand.potSize > 0 ? `${Math.round((parsedHand.villainBet / parsedHand.potSize) * 100)}% ของ pot` : ''}
                     </div>
                   </div>
                   <div className="villain-bet">{parsedHand.villainBet.toLocaleString()}</div>
                 </div>
               )}
 
-              {/* Math Panel */}
+              {/* คณิตศาสตร์ */}
               {potOdds && (
                 <div className="math-panel">
                   <div className="math-row">
-                    <span className="math-key">POT ODDS</span>
+                    <span className="math-key">Pot Odds (equity ขั้นต่ำ)</span>
                     <span className="math-val">{potOdds.ratio} ({potOdds.percentage}%)</span>
                   </div>
                   <div className="math-row">
-                    <span className="math-key">MIN DEFENSE FREQ</span>
+                    <span className="math-key">MDF (defend ขั้นต่ำ)</span>
                     <span className="math-val">{mdf}%</span>
                   </div>
                   <div className="math-row">
-                    <span className="math-key">EFFECTIVE STACK</span>
+                    <span className="math-key">Effective Stack</span>
                     <span className="math-val">{parsedHand.effectiveStack > 0 ? parsedHand.effectiveStack.toLocaleString() : '—'}</span>
                   </div>
                 </div>
               )}
 
-              {/* Hand Strength Selector */}
-              <div style={{ padding: '12px 20px 0' }}>
-                <div className="section-title" style={{ padding: '0 0 6px' }}>YOUR HAND STRENGTH</div>
+              {/* เลือกความแข็งของมือ */}
+              <div style={{ padding:'12px 20px 0' }}>
+                <div className="section-title" style={{ padding:'0 0 6px' }}>ความแข็งของมือคุณ</div>
                 <select
                   value={handStrength}
                   onChange={e => setHandStrength(e.target.value)}
                   style={{
-                    width: '100%',
-                    background: 'rgba(0,0,0,0.4)',
-                    border: '1px solid rgba(201,168,76,0.25)',
-                    borderRadius: 6,
-                    color: 'var(--gold)',
-                    fontFamily: "'Share Tech Mono', monospace",
-                    fontSize: 11,
-                    padding: '10px 12px',
-                    outline: 'none',
-                    cursor: 'pointer',
-                    letterSpacing: '0.5px',
+                    width:'100%', background:'rgba(0,0,0,0.4)',
+                    border:'1px solid rgba(201,168,76,0.25)', borderRadius:6,
+                    color:'var(--gold)', fontFamily:"'Sarabun', sans-serif",
+                    fontSize:13, fontWeight:600, padding:'10px 12px',
+                    outline:'none', cursor:'pointer',
                   }}>
                   {HAND_STRENGTHS.map(h => (
-                    <option key={h.value} value={h.value} style={{ background: '#0d1f12' }}>{h.label}</option>
+                    <option key={h.value} value={h.value} style={{ background:'#0d1f12' }}>{h.label}</option>
                   ))}
                 </select>
               </div>
 
               <div className="gto-alert">
-                ⚡ Select your hand strength above, then choose an action below. GTO analysis will follow.
+                ⚡ เลือกความแข็งมือด้านบน แล้วกดปุ่มด้านล่าง — GTO จะวิเคราะห์ให้ทันที
               </div>
 
-              {/* Action Buttons */}
+              {/* ปุ่ม Action */}
               <div className="action-row">
                 <button className="action-btn btn-fold" onClick={() => handleAction('FOLD')}>
                   <span className="btn-icon">✗</span>
-                  FOLD
-                  <span className="btn-sublabel">give up</span>
+                  พับ
+                  <span className="btn-sublabel">FOLD</span>
                 </button>
                 <button className="action-btn btn-call" onClick={() => handleAction('CALL')}>
                   <span className="btn-icon">✓</span>
-                  CALL
-                  <span className="btn-sublabel">{parsedHand.villainBet > 0 ? parsedHand.villainBet : '—'}</span>
+                  ตาม
+                  <span className="btn-sublabel">{parsedHand.villainBet > 0 ? parsedHand.villainBet : 'CALL'}</span>
                 </button>
                 <button className="action-btn btn-raise" onClick={() => handleAction('RAISE')}>
                   <span className="btn-icon">↑</span>
-                  RAISE
-                  <span className="btn-sublabel">3x+</span>
+                  ขึ้น
+                  <span className="btn-sublabel">RAISE</span>
                 </button>
               </div>
             </>
@@ -1527,10 +1341,10 @@ function App() {
         </>
       )}
 
-      {/* ── TAB: PARSER ── */}
+      {/* ── แท็บ: วิเคราะห์มือ ── */}
       {activeTab === 'parse' && (
         <div className="parser-panel">
-          <p className="section-title" style={{ padding: '0 0 8px' }}>PASTE HAND HISTORY (N8 / POKERCRAFT)</p>
+          <p className="section-title" style={{ padding:'0 0 8px' }}>วาง Hand History (N8 / PokerCraft)</p>
           <textarea
             className="hand-input"
             value={rawInput}
@@ -1539,28 +1353,27 @@ function App() {
           />
 
           {parseError && (
-            <div style={{ marginTop: 8, padding: '8px 12px', background: 'rgba(231,76,60,0.1)', border: '1px solid rgba(231,76,60,0.3)', borderRadius: 6, fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: '#e74c3c' }}>
+            <div style={{ marginTop:8, padding:'8px 12px', background:'rgba(231,76,60,0.1)', border:'1px solid rgba(231,76,60,0.3)', borderRadius:6, fontFamily:"'Sarabun'", fontSize:12, fontWeight:600, color:'#e74c3c' }}>
               ⚠ {parseError}
             </div>
           )}
 
-          <button className="parse-btn" onClick={handleParse}>PARSE & ANALYZE HAND</button>
+          <button className="parse-btn" onClick={handleParse}>วิเคราะห์มือไพ่นี้</button>
 
-          {/* Parsed result preview */}
           {parsedHand && (
             <>
-              <p className="section-title" style={{ padding: '16px 0 6px' }}>EXTRACTED DATA</p>
+              <p className="section-title" style={{ padding:'16px 0 6px' }}>ข้อมูลที่อ่านได้</p>
               <div className="parsed-grid">
                 <div className="stat-box">
-                  <div className="stat-label">HERO CARDS</div>
+                  <div className="stat-label">ไพ่ Hero</div>
                   <div className="stat-value small">
                     {parsedHand.heroCards.length > 0
                       ? parsedHand.heroCards.map(c => `${c.rank}${SUIT_SYMBOLS[c.suit]}`).join(' ')
-                      : 'NOT FOUND'}
+                      : 'ไม่พบ'}
                   </div>
                 </div>
                 <div className="stat-box">
-                  <div className="stat-label">BOARD</div>
+                  <div className="stat-label">บอร์ด</div>
                   <div className="stat-value small">
                     {parsedHand.boardCards.length > 0
                       ? parsedHand.boardCards.map(c => `${c.rank}${SUIT_SYMBOLS[c.suit]}`).join(' ')
@@ -1568,63 +1381,61 @@ function App() {
                   </div>
                 </div>
                 <div className="stat-box">
-                  <div className="stat-label">POT SIZE</div>
+                  <div className="stat-label">ขนาด Pot</div>
                   <div className="stat-value">{parsedHand.potSize || '—'}</div>
                 </div>
                 <div className="stat-box">
-                  <div className="stat-label">VILLAIN BET</div>
-                  <div className="stat-value" style={{ color: '#e74c3c' }}>{parsedHand.villainBet || '—'}</div>
+                  <div className="stat-label">Villain Bet</div>
+                  <div className="stat-value" style={{ color:'#e74c3c' }}>{parsedHand.villainBet || '—'}</div>
                 </div>
                 <div className="stat-box">
-                  <div className="stat-label">EFF. STACK</div>
+                  <div className="stat-label">Eff. Stack</div>
                   <div className="stat-value small">{parsedHand.effectiveStack || '—'}</div>
                 </div>
                 <div className="stat-box">
-                  <div className="stat-label">STREET</div>
-                  <div className="stat-value small">{parsedHand.street.toUpperCase()}</div>
+                  <div className="stat-label">Street</div>
+                  <div className="stat-value small">{STREET_TH[parsedHand.street] || '—'}</div>
                 </div>
               </div>
 
-              <button className="parse-btn" style={{ marginTop: 12, background: 'linear-gradient(135deg, #1a2a3a, #0f1e2e)', borderColor: 'rgba(46,204,113,0.4)', color: '#2ecc71' }}
+              <button className="parse-btn"
+                style={{ marginTop:12, background:'linear-gradient(135deg,#1a2a3a,#0f1e2e)', borderColor:'rgba(46,204,113,0.4)', color:'#2ecc71' }}
                 onClick={() => setActiveTab('train')}>
-                GO TO TRAINER ▶
+                ไปหน้าฝึก ▶
               </button>
             </>
           )}
         </div>
       )}
 
-      {/* ── TAB: SCENARIO LIBRARY ── */}
+      {/* ── แท็บ: โจทย์สำเร็จ ── */}
       {activeTab === 'library' && (
         <>
-          <p className="section-title">PRESET TRAINING SCENARIOS</p>
+          <p className="section-title">โจทย์ฝึกสำเร็จรูป</p>
           {PRESET_SCENARIOS.map(s => (
             <div key={s.id} className="scenario-card" onClick={() => loadScenario(s)}>
               <div>
                 <div className="scenario-name">{s.name}</div>
                 <div className="scenario-desc">{s.description}</div>
               </div>
-              <div style={{ marginLeft: 12, flexShrink: 0 }}>
-                <span className={`scenario-tag tag-${s.difficulty}`}>{s.difficulty.toUpperCase()}</span>
+              <div style={{ marginLeft:12, flexShrink:0 }}>
+                <span className={`scenario-tag tag-${s.difficulty}`}>
+                  {s.difficulty === 'easy' ? 'ง่าย' : s.difficulty === 'medium' ? 'กลาง' : 'ยาก'}
+                </span>
               </div>
             </div>
           ))}
-          <div style={{ padding: '16px 20px 0' }}>
-            <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 9, color: 'var(--text-dim)', letterSpacing: '1px', textAlign: 'center' }}>
-              // MORE SCENARIOS: Add to PRESET_SCENARIOS array in source code<br/>
-              // Include: 3-bet pots · multi-way · wet boards · tournament ICM spots
-            </div>
+          <div style={{ padding:'20px', textAlign:'center' }}>
+            <p style={{ fontFamily:"'Sarabun'", fontSize:12, color:'var(--text-dim)', lineHeight:1.8 }}>
+              เพิ่มโจทย์ได้โดยแก้ไข array <strong style={{color:'var(--gold-dim)'}}>PRESET_SCENARIOS</strong><br/>
+              ในโค้ด HTML ของแอพนี้
+            </p>
           </div>
         </>
       )}
 
-      {/* Feedback Modal */}
       {feedbackResult && (
-        <FeedbackModal
-          result={feedbackResult}
-          userAction={userAction}
-          onClose={handleCloseModal}
-        />
+        <FeedbackModal result={feedbackResult} userAction={userAction} onClose={() => { setFeedbackResult(null); setUserAction(null); }} />
       )}
     </div>
   );
